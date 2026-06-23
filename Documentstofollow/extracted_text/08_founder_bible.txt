@@ -1,0 +1,275 @@
+KodetoCareer
+Founder Bible
+KodetoCareer Platform — Document 8/10 — Confidential
+Page 1
+KodetoCareer — Founder Bible
+Version 1.0 | Confidential — Founding Team Only
+---
+1. Why We Exist
+Every year, millions of students in tier-2 and tier-3 Indian cities complete engineering degrees without the one
+thing they actually came for: a job.
+It's not their fault. They are taught by instructors who haven't worked in industry. They learn from curricula written
+fifteen years ago. They graduate into a "placement cell" that is a single faculty member with a WhatsApp group,
+doing their best against impossible odds.
+The system has failed them structurally. And the tragedy is compounded by the fact that India's tech industry is
+simultaneously facing a talent shortage — because the demand is for Python developers, ML engineers, and
+data scientists, not Java programmers who last updated their skills in 2014.
+KodetoCareer exists to close this gap. Not by replacing colleges. Not by being another Udemy. By becoming the
+infrastructure layer that connects real-world industry training to real employment outcomes — at scale, across
+hundreds of colleges, for hundreds of thousands of students.
+We are building the operating system for career-focused technical education in India.
+---
+2. Our Mission and Vision
+Mission: To make quality technical training and guaranteed placement infrastructure accessible to every student
+in India, regardless of which college they attend.
+Vision (10-year): KodetoCareer is the trusted hiring pipeline for Indian tech employers and the definitive
+learning-to-employment platform for technical graduates — the platform that produced the engineers who built
+India's next generation of technology companies.
+---
+3. Our Beliefs
+
+---PAGE BREAK---
+KodetoCareer
+Founder Bible
+KodetoCareer Platform — Document 8/10 — Confidential
+Page 2
+These are not marketing statements. These are operating beliefs that shape every product, hiring, and business
+decision.
+We believe placement is the product, not the feature.
+Every company that sells "ed-tech" in India has eventually discovered that the only thing students — and their
+parents — actually care about is: did you get me a job? We build everything backwards from that question.
+We believe the training partner is the most underserved actor in education.
+Colleges want outcomes. Students want jobs. Recruiters want talent. But nobody has built for the company in the
+middle that does the actual hard work of upskilling and placing students. That's us.
+We believe data compounds.
+Every student we train generates data. Every placement we make generates trust. Every college we partner with
+generates reach. These aren't linear — they compound. The platform we're building is designed to generate
+compounding advantages that get stronger with every cohort.
+We believe software should feel like a privilege, not an obligation.
+Too many enterprise software products are tolerated, not loved. We want students to actually open the app every
+day — not because they're forced to, but because it shows them their progress, helps them prepare, and
+connects them to opportunity. That requires building software that respects their time and intelligence.
+We believe trust is the foundation.
+We make a placement promise. If we don't deliver, we lose. This means every claim we make must be
+measurable and true. Our data cannot be massaged. Our certificates must be earned, not distributed. Our
+placement numbers must be real.
+---
+4. Business Model
+4.1 Current Revenue (Training Fees)
+KodetoCareer generates revenue by training students at colleges. The platform does not change this model — it
+makes it scalable and defensible.
+Current pricing example:
+ 4-month Python/ML/Data Science program
+ 
+ Fee per student: ■15,000–■40,000 (varies by college arrangement)
+ 
+ Revenue model: B2B to college OR B2C to students paid separately
+ 
+ Platform enables: tracking, certificates, and placement proof that justify the fee
+ 
+---PAGE BREAK---
+KodetoCareer
+Founder Bible
+KodetoCareer Platform — Document 8/10 — Confidential
+Page 3
+4.2 Near-Term Revenue Expansion (Year 1–2)
+College Partnership SaaS Fee:
+Once the platform is live and proven with pilot colleges, charge partner colleges a per-semester SaaS fee for the
+College Dashboard and analytics.
+ Pricing: ■25,000–■75,000 per college per semester
+ 
+ Value proposition: replaces manual reporting, demonstrates ROI to NAAC/NIRF
+ 
+Premium Student Features:
+Optional premium features for students who are job-seeking:
+ Resume AI review
+ 
+ Interview practice AI
+ 
+ Recruiter profile visibility
+ 
+ Price: ■499–■999/month
+ 
+4.3 Medium-Term Revenue (Year 2–3)
+Recruiter Access:
+Verified, skill-tagged student profiles become a hiring database.
+ Charge recruiters for access: ■10,000–■50,000 per hiring drive
+ 
+ Revenue share on successful hires
+ 
+Platform Licensing to Other Training Partners:
+White-label the platform to other training companies who want the same infrastructure.
+ SaaS license: ■2,00,000–■5,00,000/year per partner
+ 
+ Revenue share on placements
+ 
+Government / CSR Contracts:
+State skill development missions need digital infrastructure. Platform designed for this.
+ Project-based contracts ■50L–■5Cr range
+ 
+4.4 Unit Economics (Target State)
+Metric | Target
+CAC (College as customer) | ■50,000
+LTV (College, 3 years) | ■5,00,000+
+Gross Margin on SaaS | 70%+
+Payback Period | < 12 months
+
+---PAGE BREAK---
+KodetoCareer
+Founder Bible
+KodetoCareer Platform — Document 8/10 — Confidential
+Page 4
+Students per college per year | 200–500
+Platform revenue per student | ■2,000–■5,000
+---
+5. Go-to-Market Strategy
+Phase 1: Proof of Concept (Months 1–3)
+Goal: 3 pilot colleges live on the platform with real students.
+Tactic: Use existing relationships. The founder already has agreements with colleges. The MVP launch is not a
+sales motion — it is a proof-of-concept deployment with partners who trust us.
+Success metric: 500 active students, 80% daily engagement, 90% certificate delivery rate, 3 documented
+placements.
+Phase 2: Reference Build (Months 4–9)
+Goal: Turn 3 pilot colleges into 3 case studies that sell for us.
+Tactic:
+ Document placement outcomes with verifiable data
+ 
+ Produce 3 one-page case studies: College name, students trained, placement rate, average package
+ 
+ Use these as the primary sales asset for new college acquisition
+ 
+New college acquisition:
+ Direct outreach to placement officers and college directors in target geography
+ 
+ Attend education expos (EduTech India, regional events)
+ 
+ LinkedIn targeted outreach to TPO (Training & Placement Officers)
+ 
+Target: 10 colleges, 2,000 students
+Phase 3: Scale (Year 2)
+Goal: 50 colleges, 10,000 students, platform generates independent revenue.
+Tactic:
+ Hire 2 business development executives for college acquisition
+ 
+ Partner with NASSCOM, CII, or AICTE for credibility and lead access
+ 
+ Launch recruiter access model — turn placement data into a two-sided marketplace
+ 
+ Begin SaaS licensing conversations with other training companies
+ 
+---PAGE BREAK---
+KodetoCareer
+Founder Bible
+KodetoCareer Platform — Document 8/10 — Confidential
+Page 5
+---
+6. Competitive Moat
+Our competitive advantage is not any single feature. It is the combination of:
+Data Moat: We will know more about student skills, learning patterns, and placement outcomes than any other
+platform in our geography. This data has compounding value.
+Relationship Moat: Colleges sign multi-year agreements. Students graduate and recommend us to their
+colleges. Recruiters who hire through us come back.
+Verification Moat: KodetoCareer certificates have a public verification URL. Over time, recruiters will come to
+trust our certification because they have hired students who held them.
+Operations Moat: Our platform makes the training partner's operations 10x more efficient. Switching away
+means losing all their historical data, analytics, and workflows. High switching cost = long retention.
+---
+7. Culture & Values
+7.1 How We Work
+Ownership Culture:
+Every team member owns their domain. A developer who builds the quiz system owns the quiz system — from
+design review to production bugs. We don't pass problems around. We take them.
+Bias to Shipping:
+A feature that is 80% perfect and deployed is worth more than a feature that is 100% perfect in development. We
+ship, we learn, we iterate. We do not plan in the dark for months.
+Written Communication:
+Decisions must be documented. The Founder Bible, PRDs, and architecture decisions exist so that the team can
+move fast without constant synchronous coordination. If a decision isn't written down, it doesn't exist.
+Data Over Opinions:
+We don't argue about what students want. We measure it. If engagement on a feature is below 20%, the feature
+is failing regardless of how strongly someone believes in it.
+
+---PAGE BREAK---
+KodetoCareer
+Founder Bible
+KodetoCareer Platform — Document 8/10 — Confidential
+Page 6
+7.2 Hiring Principles
+Hire for slope, not intercept.
+We prefer a candidate who has improved dramatically over 12 months over a candidate who peaked early.
+Learning speed matters more than current level.
+Hire people who've shipped things.
+Real projects, side products, open source contributions — evidence of delivery. We do not hire people whose
+only experience is in academic settings.
+Every hire must raise the team's average.
+The standard for our 10th hire is higher than the standard for our 5th hire. We always ask: is this person better
+than our current weakest link?
+No brilliant jerks.
+Technical excellence does not excuse poor collaboration, communication, or treatment of teammates. Culture is
+non-negotiable.
+7.3 Decision Making
+For reversible decisions: individual or small group, move fast.
+For irreversible decisions (architecture, pricing, key hires): write a one-pager, get input from all affected parties,
+then decide.
+The founder makes the final call on product direction, hiring, and business model. Engineering leads make final
+calls on architecture. Design leads make final calls on UX within agreed frameworks.
+---
+8. Founder Operating Principles
+On the Platform:
+The platform is the product and the business simultaneously. Every hour spent on manual work that could be
+automated is an hour the business cannot scale. Automate aggressively from day one.
+On Colleges:
+Colleges are our distribution channel, not our customer. The student is our customer. We must always serve both
+— but never forget that students are the reason we exist.
+On Revenue:
+
+---PAGE BREAK---
+KodetoCareer
+Founder Bible
+KodetoCareer Platform — Document 8/10 — Confidential
+Page 7
+We will not discount our services to win a college that doesn't value them. A college that pays ■15,000 per
+student values the outcome. A college that demands ■5,000 per student values the price. We want the former.
+On Hiring:
+The first three engineers we hire will define the culture for the next fifty. Hire slowly. Hire right. Pay fairly.
+On Product:
+Build less. Build it well. Ship it fast. Listen to feedback. Improve. Repeat.
+Never build a feature that can't be measured. Never measure a metric that can't be acted on.
+On Placements:
+Every unplaced student is a personal failure. Not a statistic. We know their name. We know their story. We will
+fight for their placement.
+---
+9. Milestones & Success Definition
+Milestone | Target Date | Definition
+MVP Live | Month 3 | Platform live with 3 colleges, 500 students active
+First Certificate Batch | Month 4 | 100+ certificates generated and delivered
+First Placement Documented | Month 4 | 1 student placed with offer letter uploaded to platform
+Platform Self-sustaining | Month 9 | Platform fee revenue covers AWS + 1 tech hire
+10 Colleges | Month 12 | 10 active partner colleges, 2,000 students
+Recruiter Marketplace | Month 18 | 5 recruiters paying for student access
+Series A Ready | Month 24 | ■5Cr+ ARR, 30+ colleges, 10,000 students, placement rate > 60%
+---
+10. What We Will Not Do
+Being clear about what we will not do is as important as knowing what we will.
+We will not become a consumer ed-tech product. We serve the training partner model. Going B2C at scale
+requires marketing budgets we do not have and will not chase.
+We will not compromise on placement data integrity. Every placement number we publish must be real and
+verifiable. A platform built on inflated numbers will collapse.
+
+---PAGE BREAK---
+KodetoCareer
+Founder Bible
+KodetoCareer Platform — Document 8/10 — Confidential
+Page 8
+We will not build features for the sake of features. The platform will never have a feature that doesn't solve a
+real problem for a real user. No bloatware.
+We will not raise VC money before we have product-market fit. We will build profitably or on founder capital
+until we have clear evidence that more capital will multiply a working model, not discover one.
+We will not abandon tier-2 colleges for metro colleges. Our mission is to serve the underserved. The moment
+we chase IIT alumni is the moment we've lost our reason to exist.
+---
+End of Founder Bible
+This document should be updated quarterly as the company grows.
+Classification: Confidential — Founding Team Only
+
+---PAGE BREAK---

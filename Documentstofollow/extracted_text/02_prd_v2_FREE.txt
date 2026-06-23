@@ -1,0 +1,64 @@
+KodetoCareer
+PRD — Free Stack Updates — v2.0 FREE STACK
+KodetoCareer — Document 02 (Updated Free Stack) — Confidential
+Page 1
+KodetoCareer — PRD (Updated Sections Only)
+Version 2.0 | Free Stack Corrections
+Only the sections with paid service references are updated below. All other PRD content (modules 1–9
+functional requirements, non-functional requirements, MVP scope, success metrics) remains identical to
+PRD v1.
+CHANGED SECTION: Module 2.2 — Video Management
+FR-2.2.1 (Updated)
+Uploaded videos shall be stored on Cloudflare R2 and served via Cloudflare CDN (free, zero egress cost).
+AWS S3 and CloudFront are not used.
+FR-2.2.2 (Unchanged)
+The system shall support two video source types: direct upload (MP4 up to 2GB) and embedded URL (YouTube,
+Vimeo, Google Drive).
+FR-2.2.3 (Updated)
+Direct-upload videos shall be transcoded to adaptive bitrate (480p, 720p, 1080p) using AWS MediaConvert.
+Replaced with: Direct-upload videos are stored as original MP4 on Cloudflare R2 and served directly from the
+Cloudflare CDN — no server-side transcoding for MVP. For large course videos, trainers are encouraged to
+upload to YouTube (unlisted) and paste the embed URL, which provides adaptive quality delivery for free.
+FR-2.2.4 (Updated)
+Video player must support: playback speed control (0.5x to 2x), fullscreen, and picture-in-picture. Quality
+selection is not available for direct-upload MP4s in the MVP (no transcoding). YouTube/Vimeo embeds provide
+their own quality selector.
+FR-2.2.5 (Unchanged) — Video watch progress persisted, resume from last position.
+FR-2.2.6 (Unchanged) — Videos not downloadable by students (stream-only via CDN).
+FR-2.2.7 (Unchanged) — Admin panel shows per-video analytics.
+CHANGED SECTION: Module 8 — Communication System
+FR-8.1 (Unchanged) — Announcements can be sent to any scope.
+FR-8.2 (Unchanged) — Notifications appear in-app and trigger push notifications.
+FR-8.3 (Updated)
+The system shall send automated email notifications via Resend (free, 3,000/month) for: new lesson available,
+quiz deadline approaching, assignment graded, certificate ready, attendance below threshold. AWS SES is not
+used.
+
+---PAGE BREAK---
+KodetoCareer
+PRD — Free Stack Updates — v2.0 FREE STACK
+KodetoCareer — Document 02 (Updated Free Stack) — Confidential
+Page 2
+FR-8.4 (Updated)
+A bulk SMS option (via Twilio or MSG91) shall be available for critical communications.
+Replaced with: SMS is not included in the MVP. All OTPs and critical alerts are delivered via email. SMS (Twilio
+or MSG91) shall be added as an optional feature in Version 2 once the platform generates revenue. This
+eliminates ~■1,500/month in recurring SMS cost during the startup phase.
+FR-8.5 (Unchanged) — WhatsApp notification integration remains a Version 2 feature.
+CHANGED SECTION: Non-Functional Requirements — Data Backup
+Original:
+Data backup frequency: Daily automated backup to separate AWS region
+Updated:
+Data backup is handled automatically by Neon.tech's built-in point-in-time recovery (free tier: 7 days). Cloudflare
+R2 provides 99.999999999% durability. No manual backup configuration required. No additional cost.
+SUMMARY OF ALL SERVICE CHANGES IN PRD
+Original | Updated | Cost Impact
+AWS S3 + CloudFront | Cloudflare R2 + CDN | ■4,000/month → ■0
+AWS MediaConvert (transcoding) | Removed from MVP; direct MP4 + YouTube embed | ■3,000/month → ■0
+AWS SES (email) | Resend (free 3,000/month) | ■500/month → ■0
+MSG91 / Twilio (SMS) | Email OTP only; SMS in v2 | ■800/month → ■0
+AWS RDS backup | Neon.tech built-in | Included in ■0
+End of PRD Updated Sections
+All other PRD content is unchanged from v1.
+
+---PAGE BREAK---

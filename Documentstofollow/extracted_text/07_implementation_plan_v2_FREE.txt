@@ -1,0 +1,253 @@
+KodetoCareer
+Implementation Plan — Free Stack Updates — v2.0 FREE STACK
+KodetoCareer — Document 07 (Updated Free Stack) — Confidential
+Page 1
+KodetoCareer — Implementation Plan
+Version 2.0 | Updated — Free Infrastructure Stack
+Only the changed sections are included here. All sprint content not listed below remains identical to
+Implementation Plan v1.
+CHANGED SECTION: Pre-Sprint Preparation (Week 0)
+Infrastructure & Tooling Setup (DevOps + Backend):
+■ Oracle Cloud account — sign up at cloud.oracle.com (no credit card required for Always Free tier)
+ 
+■ Provision Oracle Cloud VM:
+ 
+ Shape: VM.Standard.A1.Flex
+ 
+ OCPUs: 4, RAM: 24GB, Storage: 200GB boot volume
+ 
+ OS: Ubuntu 22.04 LTS
+ 
+ All permanently free, never expires
+ 
+■ Install on VM: Node.js 20, Nginx, PM2, Git, Certbot (not needed if using Cloudflare SSL)
+ 
+■ Configure Nginx as reverse proxy to port 3000
+ 
+■ Open VM security group ports: 22 (SSH), 80 (HTTP), 443 (HTTPS)
+ 
+■ Neon.tech account — sign up at neon.tech (free, no credit card required)
+ 
+ Create project: "kodetocareer-production"
+ 
+ Copy connection string → set as DATABASE_URL
+ 
+ Enable connection pooling in Neon dashboard
+ 
+■ Upstash account — sign up at upstash.com (free, no credit card required)
+ 
+ Create Redis database: "kodetocareer-cache"
+ 
+ Copy REST URL and Token → set as UPSTASH_REDIS_* env vars
+ 
+ Copy Redis URL → set as UPSTASH_REDIS_URL (for Bull queue)
+ 
+■ Cloudflare account — sign up at cloudflare.com (free)
+ 
+ Add your domain → update nameservers at your registrar
+ 
+ Enable SSL/TLS: Full (strict) mode
+ 
+ Create R2 bucket: "kodetocareer-production"
+ 
+ Create R2 API token with read/write permissions
+ 
+ Add custom domain to R2 bucket: cdn.kodetocareer.com
+ 
+ ■ This replaces: AWS S3 + CloudFront + AWS Certificate Manager
+ 
+■ Resend account — sign up at resend.com (free, no credit card required)
+ 
+ Verify your sending domain (kodetocareer.com)
+ 
+ Create API key → set as RESEND_API_KEY
+ 
+ Free tier: 3,000 emails/month, 100/day
+ 
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan — Free Stack Updates — v2.0 FREE STACK
+KodetoCareer — Document 07 (Updated Free Stack) — Confidential
+Page 2
+ ■ This replaces: AWS SES
+ 
+■ Firebase project — console.firebase.google.com (free)
+ 
+ Enable Cloud Messaging (FCM) for push notifications
+ 
+ Enable Analytics and Crashlytics for mobile app
+ 
+ ■ No change from original
+ 
+■ Sentry account — sentry.io (free tier: 5,000 errors/month)
+ 
+ Create two projects: kodetocareer-api, kodetocareer-app
+ 
+■ UptimeRobot — uptimerobot.com (free: 50 monitors)
+ 
+ Add monitor for: api.kodetocareer.com/health
+ 
+ Set alert email for downtime notification
+ 
+■ GitHub repository — github.com (free for private repos)
+ 
+ Create repo, set up branch strategy (main, develop, feature/*)
+ 
+ Add GitHub Secrets: ORACLE_HOST, ORACLE_SSH_KEY
+ 
+ Set up GitHub Actions CI/CD workflow (free 2,000 min/month)
+ 
+■ Domain registration
+ 
+ Register domain at Namecheap or GoDaddy (~■800/year — only non-free item)
+ 
+ Point nameservers to Cloudflare
+ 
+■ Database migration: npx prisma migrate deploy against Neon connection string
+ 
+■ Seed data: 2 pilot colleges, 5 batches, 50 test students
+ 
+REMOVED from original Week 0 (all were paid):
+ AWS account setup → Oracle Cloud (free)
+ 
+ S3 bucket creation → Cloudflare R2 (free)
+ 
+ RDS PostgreSQL → Neon.tech (free)
+ 
+ ElastiCache Redis → Upstash (free)
+ 
+ CloudFront distribution → Cloudflare CDN (free)
+ 
+ AWS Certificate Manager → Cloudflare SSL (free)
+ 
+ SES configuration → Resend (free)
+ 
+ MSG91 configuration → Email OTP only (free)
+ 
+CHANGED SECTION: Sprint 4 — Video Delivery (Week 4)
+REMOVED (was paid AWS MediaConvert pipeline):
+ MediaConvert job creation
+ 
+ Lambda function for processing
+ 
+ HLS transcoding (480p/720p/1080p)
+ 
+ Adaptive bitrate streaming
+ 
+REPLACED WITH (free):
+
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan — Free Stack Updates — v2.0 FREE STACK
+KodetoCareer — Document 07 (Updated Free Stack) — Confidential
+Page 3
+Backend:
+■ Direct MP4 upload via R2 presigned URL (same SDK, S3-compatible)
+ 
+■ On upload confirm: update lesson.videoStatus = 'READY', store R2 CDN URL
+ 
+■ No transcoding needed — video served directly from Cloudflare CDN
+ 
+■ YouTube/Vimeo embed URL support (paste URL, store as lesson.external_url)
+ 
+■ Thumbnail: extract first frame client-side using canvas API (or let admin upload manually)
+ 
+Flutter:
+■ Video player integration (video_player + chewie)
+ 
+■ For direct uploads: play MP4 from Cloudflare CDN URL
+ 
+■ For YouTube/Vimeo: use webview_flutter to embed (or youtube_player_flutter package)
+ 
+■ Custom controls: speed, fullscreen, PiP
+ 
+■ Video progress persistence
+ 
+■ "Mark complete" button (after 80% watched)
+ 
+React (Admin):
+■ Video source type selector: [Upload MP4] vs [YouTube/Vimeo URL]
+ 
+■ Upload: presigned R2 URL flow with progress bar
+ 
+■ Status: once upload confirmed, status immediately becomes READY (no processing wait)
+ 
+■ URL embed: paste YouTube/Vimeo URL → preview shown inline
+ 
+Sprint 4 Deliverable: Full video lesson delivery working — both direct upload (MP4 on R2) and YouTube/Vimeo
+embed. No MediaConvert dependency.
+CHANGED SECTION: Sprint 9 — SMS Change
+Sprint 9 — Communication (Original line):
+- [ ] SMS integration (MSG91 for OTP and alerts)
+Replace with:
+■ Email OTP system (already built in Sprint 1 — no change needed)
+ 
+■ All critical alerts via email (Resend) — attendance below threshold, quiz result, assignment graded
+ 
+■ Note in system settings: SMS available as future paid add-on (Twilio/MSG91) when business generates
+ revenue
+No MSG91 or Twilio account needed.
+CHANGED SECTION: Risk Register Updates
+Risks REMOVED (no longer applicable):
+ MediaConvert costs exceed budget — removed from stack
+ 
+ AWS RDS pricing — replaced with Neon.tech (free)
+ 
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan — Free Stack Updates — v2.0 FREE STACK
+KodetoCareer — Document 07 (Updated Free Stack) — Confidential
+Page 4
+ Push notifications not delivered — FCM still used, no change
+ 
+Risks UPDATED:
+Risk | Likelihood | Impact | Mitigation
+Neon.tech 0.5GB storage limit | Low (MVP) | Medium | 0.5GB holds ~50,000 student records easily. Upgrade to
+Neon paid ($19/month) only when needed
+Upstash 10K commands/day limit | Medium (at scale) | Low | At 1,000 daily users: ~10 commands/user = 10,000.
+Monitor and upgrade when needed ($0.20/100K commands)
+Cloudflare R2 10GB storage limit | Low (MVP) | Medium | 10GB = ~200 videos at 50MB average. Use YouTube
+embed for large videos to stay within limit
+Oracle Cloud VM single instance | Medium | High | PM2 cluster mode uses all 4 OCPUs. Take daily DB
+snapshot. Recovery < 1 hour
+Resend 100 emails/day limit | Medium (at scale) | Medium | 100/day = 3,000/month. For 500 students this is fine.
+Upgrade to Resend paid ($20/month) at scale
+Video quality without transcoding | Low | Low | For MVP, one quality level is acceptable. Add transcoding
+(Cloudflare Stream) in v2 when revenue exists
+Oracle Cloud account free tier limit | Low | High | Oracle has been stable with free tier. No reports of forced
+upgrades. Keep account active with monthly login
+CHANGED SECTION: Budget Estimate
+Infrastructure Cost (Updated — Free Stack)
+Service | Cost | Notes
+Oracle Cloud VM (4 OCPU, 24GB RAM) | **■0** | Always Free, permanent
+Neon.tech PostgreSQL | **■0** | Free tier, permanent
+Upstash Redis | **■0** | Free tier, 10K cmd/day
+Cloudflare R2 Storage (10GB) | **■0** | Free tier, permanent
+Cloudflare CDN + SSL + DNS | **■0** | Free, permanent
+Resend Email (3,000/month) | **■0** | Free tier, permanent
+Firebase FCM + Analytics | **■0** | Free, permanent
+Sentry (5,000 errors/month) | **■0** | Free tier, permanent
+UptimeRobot (50 monitors) | **■0** | Free tier, permanent
+GitHub Actions CI/CD | **■0** | Free for private repos
+Domain (kodetocareer.com) | **~■800/year** | Only unavoidable cost
+MSG91 / Twilio SMS | **■0** | Removed from MVP
+**Total Monthly Infrastructure** | **■0/month** | (■67/month amortised domain)
+
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan — Free Stack Updates — v2.0 FREE STACK
+KodetoCareer — Document 07 (Updated Free Stack) — Confidential
+Page 5
+Compared to original plan: saves ■31,300/month = ■3,75,600/year
+When to Upgrade (Paid Services)
+Only upgrade when you have revenue. These are the thresholds:
+When This Happens | Then Add
+>3,000 emails/month | Resend paid: $20/month
+>10,000 Redis commands/day | Upstash pay-per-use: ~$2/month
+>10GB video storage on R2 | Use YouTube unlisted (free) OR Cloudflare Stream ($5/1,000 min)
+>0.5GB database | Neon paid: $19/month (scales to 100GB)
+SMS OTP needed | Twilio or MSG91: ~■1,500/month
+End of Updated Implementation Plan Sections
+All other sprint content (1, 2, 3, 5, 6, 7, 8, 10) is unchanged from v1.
+
+---PAGE BREAK---

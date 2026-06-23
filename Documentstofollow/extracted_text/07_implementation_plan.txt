@@ -1,0 +1,558 @@
+KodetoCareer
+Implementation Plan
+KodetoCareer Platform — Document 7/10 — Confidential
+Page 1
+KodetoCareer — Implementation Plan
+Version 1.0 | 10-Week MVP Roadmap
+---
+1. Team Structure
+Recommended Team for MVP
+Role | Count | Responsibilities
+Backend Developer (Node.js) | 1–2 | API development, database, integrations
+Frontend Developer (React.js) | 1 | Admin panel and college portal
+Flutter Developer | 1 | Mobile app (iOS + Android)
+UI/UX Designer | 1 | Figma designs, prototypes, handoff
+DevOps / Infrastructure | 0.5 (part-time or backend dev doubles) | AWS setup, CI/CD, deployment
+Product Manager / Founder | 1 | Requirement clarification, QA sign-off
+QA Tester | 1 (from Week 6) | Test execution, bug reporting
+Total: 5–7 people
+If budget is constrained:
+ A senior full-stack developer can handle both Node.js backend and React frontend
+ 
+ Flutter developer is a separate skill set — do not compromise here
+ 
+ UI/UX can be done by founder using the detailed brief and Figma templates initially
+ 
+---
+2. Pre-Sprint Preparation (Week 0 — Before Development Starts)
+Infrastructure & Tooling Setup (DevOps + Backend):
+ [ ] AWS account setup with IAM roles and billing alerts
+ 
+ [ ] Create: S3 buckets, RDS PostgreSQL instance (t3.micro for dev), ElastiCache Redis
+ 
+ [ ] Configure CloudFront distribution
+ 
+ [ ] Set up GitHub repository with branch strategy (main, develop, feature/*)
+ 
+ [ ] Configure GitHub Actions CI pipeline (lint + test on every PR)
+ 
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan
+KodetoCareer Platform — Document 7/10 — Confidential
+Page 2
+ [ ] Set up staging and production environments
+ 
+ [ ] Domain registration and SSL certificates (AWS Certificate Manager)
+ 
+ [ ] Configure SES for transactional email, MSG91 for SMS
+ 
+ [ ] Set up Sentry for error tracking (free tier)
+ 
+Design Preparation:
+ [ ] Finalize brand guidelines (logo, colours, fonts) — use this brief
+ 
+ [ ] Set up Figma workspace with design system components
+ 
+ [ ] Design Priority 1 screens (see UI/UX Brief Section 12)
+ 
+ [ ] Create Figma prototype for student onboarding flow for early user testing
+ 
+Planning:
+ [ ] Break each epic into Jira/Linear tickets with acceptance criteria
+ 
+ [ ] Create API contract (OpenAPI YAML) before any coding starts
+ 
+ [ ] Set up shared Postman collection for API testing
+ 
+ [ ] Define test data: 2 colleges, 5 batches, 50 students for seed data
+ 
+---
+3. Sprint Plan (10 Weeks × 1-Week Sprints)
+---
+SPRINT 1 — Foundation & Auth (Week 1)
+Backend:
+ [ ] Set up Express.js project structure with TypeScript
+ 
+ [ ] Configure Prisma with PostgreSQL, run initial migration
+ 
+ [ ] Implement users table, all auth endpoints:
+ 
+ POST /auth/register
+ 
+ POST /auth/verify-email
+ 
+ POST /auth/login
+ 
+ POST /auth/forgot-password
+ 
+ POST /auth/reset-password
+ 
+ POST /auth/refresh
+ 
+ POST /auth/logout
+ 
+ [ ] JWT middleware (access token validation)
+ 
+ [ ] Role-based access control middleware
+ 
+ [ ] Rate limiting setup
+ 
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan
+KodetoCareer Platform — Document 7/10 — Confidential
+Page 3
+ [ ] Basic error handling middleware
+ 
+Flutter:
+ [ ] Project setup (folder structure, dependencies in pubspec.yaml)
+ 
+ [ ] Set up Riverpod state management
+ 
+ [ ] Set up Dio HTTP client with interceptors
+ 
+ [ ] Implement: Splash, Onboarding, Login, Register, Email OTP, Profile Setup screens
+ 
+ [ ] Secure token storage (flutter_secure_storage)
+ 
+ [ ] Navigate to Dashboard on successful login
+ 
+React (Admin):
+ [ ] Project setup with Vite, Tailwind, shadcn/ui
+ 
+ [ ] Set up React Router with protected routes
+ 
+ [ ] Admin login page
+ 
+ [ ] Super Admin dashboard shell (with sidebar navigation)
+ 
+ [ ] Axios instance with auth interceptors
+ 
+Sprint 1 Deliverable: A user can register, verify email, complete profile, and log in to the app. Admin can log in
+to the web panel.
+---
+SPRINT 2 — College & User Management (Week 2)
+Backend:
+ [ ] College CRUD endpoints
+ 
+ [ ] Trainer CRUD endpoints
+ 
+ [ ] College Admin creation (with auto-invite email)
+ 
+ [ ] Student bulk import (CSV parsing, validation, response)
+ 
+ [ ] Student profile endpoints (GET, PUT)
+ 
+ [ ] Audit log middleware (auto-log all write operations)
+ 
+React (Admin):
+ [ ] College Management page (list, create, edit, deactivate)
+ 
+ [ ] College detail page with tabs (Overview, Students, Batches, Reports)
+ 
+ [ ] Trainer management page
+ 
+ [ ] Student management page with search, filter
+ 
+Flutter:
+ [ ] My Profile screen (view and edit)
+ 
+ [ ] Profile photo upload
+ 
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan
+KodetoCareer Platform — Document 7/10 — Confidential
+Page 4
+ [ ] Settings screen (change password, notifications)
+ 
+Sprint 2 Deliverable: Admin can create colleges, trainers, and import students. Students can view and edit their
+profiles.
+---
+SPRINT 3 — Course & Content Structure (Week 3)
+Backend:
+ [ ] Course CRUD with publishing workflow
+ 
+ [ ] Module CRUD (with sort order)
+ 
+ [ ] Lesson CRUD (with all lesson types)
+ 
+ [ ] Lesson Notes (PDF) upload to S3
+ 
+ [ ] S3 presigned URL generation for secure content delivery
+ 
+ [ ] Student lesson progress tracking endpoints
+ 
+React (Admin):
+ [ ] Course Management page (create, edit, publish)
+ 
+ [ ] Course builder UI (module + lesson drag-and-drop order)
+ 
+ [ ] Lesson editor (tabbed: video source, PDF upload, text content)
+ 
+ [ ] File upload with progress indicator
+ 
+Flutter:
+ [ ] Course list (Learn tab)
+ 
+ [ ] Course detail (modules accordion)
+ 
+ [ ] Lesson detail (tabs: Video, Notes, My Notes)
+ 
+ [ ] PDF viewer (flutter_pdfview)
+ 
+ [ ] Personal notes editor
+ 
+Sprint 3 Deliverable: Admin can create complete courses with content. Students can browse course content
+and view PDFs.
+---
+SPRINT 4 — Video Delivery (Week 4)
+Backend:
+ [ ] Large video upload via S3 multipart (presigned parts)
+ 
+ [ ] AWS MediaConvert job creation Lambda (or triggered from Node.js)
+ 
+ [ ] MediaConvert completion webhook → update lesson video status
+ 
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan
+KodetoCareer Platform — Document 7/10 — Confidential
+Page 5
+ [ ] Adaptive video URL serving (HLS via CloudFront)
+ 
+ [ ] Video progress tracking (resume position)
+ 
+Flutter:
+ [ ] Video player integration (video_player + chewie)
+ 
+ [ ] Custom controls (speed, quality, fullscreen, PiP)
+ 
+ [ ] Video progress persistence (last position saved)
+ 
+ [ ] "Mark complete" button logic (appears at 80%)
+ 
+ [ ] Module/lesson completion celebration animation (Lottie)
+ 
+React (Admin):
+ [ ] Video upload progress UI with status tracking
+ 
+ [ ] Video processing status indicator on lesson card
+ 
+Sprint 4 Deliverable: Full video lesson delivery working end-to-end on mobile.
+---
+SPRINT 5 — Batch & Attendance (Week 5)
+Backend:
+ [ ] Batch CRUD endpoints
+ 
+ [ ] Batch student enrollment (individual + CSV bulk)
+ 
+ [ ] Class session CRUD
+ 
+ [ ] Attendance marking endpoints (with 24h override rule)
+ 
+ [ ] Attendance summary calculation
+ 
+ [ ] Attendance export (Excel/PDF generation with ExcelJS + PDFKit)
+ 
+React (Admin):
+ [ ] Batch Management page (create wizard, list, detail)
+ 
+ [ ] Batch student list (enroll, remove, status)
+ 
+ [ ] Trainer: Attendance marking screen
+ 
+ [ ] Attendance history and edit UI
+ 
+Flutter:
+ [ ] Student: View attendance per batch (percentage, session-by-session)
+ 
+ [ ] Attendance history screen
+ 
+ [ ] Push notification receipt for attendance marked
+ 
+Sprint 5 Deliverable: Trainers can create sessions and mark attendance. Students see their attendance. Admin
+sees per-batch reports.
+
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan
+KodetoCareer Platform — Document 7/10 — Confidential
+Page 6
+---
+SPRINT 6 — Assessments (Week 6)
+Backend:
+ [ ] Quiz CRUD (with question bank)
+ 
+ [ ] Quiz attempt start/auto-save/submit
+ 
+ [ ] Quiz scoring engine (MCQ_SINGLE, MCQ_MULTIPLE, TRUE_FALSE)
+ 
+ [ ] Quiz leaderboard computation
+ 
+ [ ] Assignment CRUD
+ 
+ [ ] Assignment submission + grading endpoints
+ 
+ [ ] Notification triggers for quiz results and graded assignments
+ 
+React (Admin):
+ [ ] Quiz builder (question types, options, correct answer, marks)
+ 
+ [ ] Assignment creation and management
+ 
+ [ ] Grade assignments (view submission, enter marks, feedback)
+ 
+ [ ] Quiz analytics (per-question correct % breakdown)
+ 
+Flutter:
+ [ ] Quiz list (Tests tab)
+ 
+ [ ] Quiz detail and start flow
+ 
+ [ ] Quiz screen (single question, timer, auto-save)
+ 
+ [ ] Quiz result screen (score, answer review)
+ 
+ [ ] Assignment list, submission flow
+ 
+ [ ] Quiz leaderboard screen
+ 
+Sprint 6 Deliverable: Full assessment lifecycle working — creation, attempt, scoring, and results.
+---
+SPRINT 7 — Certificates & Documents (Week 7)
+Backend:
+ [ ] Certificate eligibility check endpoint
+ 
+ [ ] Certificate PDF generation (ReportLab/PDFKit with template)
+ 
+ [ ] Certificate upload to S3 and delivery URL
+ 
+ [ ] Public verification endpoint (no auth)
+ 
+ [ ] Bulk certificate generation (Bull queue)
+ 
+ [ ] Student documents upload (offer letters, internship letters)
+ 
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan
+KodetoCareer Platform — Document 7/10 — Confidential
+Page 7
+ [ ] Placement record CRUD
+ 
+React (Admin):
+ [ ] Certificate management page (eligibility table, override, generate)
+ 
+ [ ] Bulk generation progress UI (socket-powered live updates)
+ 
+ [ ] Upload offer/internship letter to student profile
+ 
+ [ ] Placement record management
+ 
+Flutter:
+ [ ] My Certificates screen (list, view, share)
+ 
+ [ ] Certificate PDF viewer
+ 
+ [ ] Share sheet integration (LinkedIn, WhatsApp, copy link)
+ 
+ [ ] My Documents screen (offer letters, download)
+ 
+Sprint 7 Deliverable: Certificate generation pipeline complete. Students can view and share certificates.
+---
+SPRINT 8 — Placement Hub & Job Board (Week 8)
+Backend:
+ [ ] Placement analytics endpoints
+ 
+ [ ] Job opportunity CRUD
+ 
+ [ ] Job interest recording
+ 
+ [ ] Placement readiness score calculation (composite algorithm)
+ 
+ [ ] Placement status update
+ 
+React (Admin):
+ [ ] Placement analytics dashboard (charts: placed by month, by company, avg package)
+ 
+ [ ] Post job opportunity form
+ 
+ [ ] Job management (edit, deactivate)
+ 
+ [ ] Student placement status management
+ 
+Flutter:
+ [ ] Placement Hub screen (status, score, quick actions)
+ 
+ [ ] Job board (list, filter by type)
+ 
+ [ ] Job detail + "I'm Interested" flow
+ 
+ [ ] Placement status display
+ 
+Sprint 8 Deliverable: Placement tracking and job board live. Admin can see placement analytics.
+---
+
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan
+KodetoCareer Platform — Document 7/10 — Confidential
+Page 8
+SPRINT 9 — Communication, College Portal & Analytics (Week 9)
+Backend:
+ [ ] Announcement send endpoint (scoped to all/college/batch/individual)
+ 
+ [ ] Notification recipient creation (fan-out)
+ 
+ [ ] FCM push notification integration
+ 
+ [ ] Email notification system (all templates from TRD Section 10)
+ 
+ [ ] SMS integration (MSG91 for OTP and alerts)
+ 
+ [ ] College admin scoped endpoints
+ 
+ [ ] Analytics aggregation endpoints
+ 
+ [ ] Weekly report auto-generation (Bull cron job)
+ 
+React (Admin):
+ [ ] Communication center (compose announcement, scope selector, send)
+ 
+ [ ] College admin portal (dedicated routes, college-scoped views)
+ 
+ [ ] Analytics centre (platform-wide charts)
+ 
+ [ ] Student at-risk report
+ 
+Flutter:
+ [ ] Notification centre (in-app notification list, mark read)
+ 
+ [ ] Push notification tap handling + deep link navigation
+ 
+Sprint 9 Deliverable: Communication system live. College admins can log in and view their dashboards.
+---
+SPRINT 10 — Polish, Testing & Launch Prep (Week 10)
+Quality Assurance (all team):
+ [ ] End-to-end test all user flows (student, trainer, admin, college admin)
+ 
+ [ ] Load testing (simulate 500 concurrent users on API)
+ 
+ [ ] Mobile testing on real devices (minimum: Android mid-range, Android budget, iPhone 12)
+ 
+ [ ] API security audit (OWASP top 10 check)
+ 
+ [ ] Data validation testing (CSV imports with malformed data)
+ 
+Performance:
+ [ ] Audit and fix slow API endpoints (anything > 500ms under load)
+ 
+ [ ] Implement Redis caching for high-traffic read endpoints
+ 
+ [ ] Image and asset compression audit
+ 
+ [ ] Flutter app size optimisation (tree shaking, deferred libraries)
+ 
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan
+KodetoCareer Platform — Document 7/10 — Confidential
+Page 9
+Polish:
+ [ ] All empty states designed and implemented
+ 
+ [ ] All error messages are human-readable (no raw API error codes exposed)
+ 
+ [ ] Skeleton loaders on all content screens
+ 
+ [ ] Offline handling on Flutter (graceful error when no network)
+ 
+ [ ] Review all notification copy
+ 
+Deployment:
+ [ ] Production infrastructure finalised
+ 
+ [ ] Environment variables secured in AWS Secrets Manager
+ 
+ [ ] Database seeded with pilot data (3 colleges, real course content)
+ 
+ [ ] App Store and Play Store submission (Flutter)
+ 
+ [ ] DNS configuration, SSL verification
+ 
+ [ ] Monitoring dashboards live (CloudWatch, Sentry)
+ 
+ [ ] Runbook written for common operational tasks
+ 
+Pilot Onboarding:
+ [ ] 3 pilot college agreements signed
+ 
+ [ ] College admins trained (1-hour walkthrough per college)
+ 
+ [ ] First student batch imported and notified
+ 
+ [ ] Trainer walkthrough for attendance and quiz creation
+ 
+---
+4. Risk Register
+Risk | Likelihood | Impact | Mitigation
+Video processing pipeline delayed | Medium | High | Build with YouTube embed first, own upload in Sprint 4
+Flutter developer bottleneck | Medium | High | Prepare detailed Flutter widget specs before Sprint 1
+College onboarding slower than expected | High | Medium | Don't wait for all 3 — go live with 1 college for alpha
+MediaConvert costs exceed budget | Low | Medium | Cap video uploads at 720p initially, monitor spend
+Push notifications not delivered on budget Android | Medium | Medium | Test FCM early (Sprint 1), have SMS
+fallback
+AWS RDS pricing | Low | Low | Start with t3.micro, upgrade on need
+College admin resistance to adoption | Medium | High | Design simplest possible college portal for MVP
+---
+
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan
+KodetoCareer Platform — Document 7/10 — Confidential
+Page 10
+5. Post-MVP Roadmap (Version 2 — Months 4–7)
+Feature | Priority | Estimated Effort
+Resume builder | P1 | 3 weeks
+AI mock interview (Claude API) | P1 | 4 weeks
+Coding assessment platform (Monaco Editor + Judge0) | P1 | 5 weeks
+WhatsApp automation (via Interakt) | P2 | 2 weeks
+Recruiter portal (separate login) | P2 | 4 weeks
+College analytics advanced charts | P2 | 2 weeks
+Gamification (points, badges, leaderboard) | P3 | 3 weeks
+Multi-language support (Hindi) | P3 | 3 weeks
+---
+6. Budget Estimate (MVP)
+Development Cost (10 weeks)
+Role | Rate | Duration | Cost
+Backend Dev (Node.js) | ■60,000/month | 2.5 months | ■1,50,000
+Flutter Dev | ■70,000/month | 2.5 months | ■1,75,000
+React Dev | ■55,000/month | 2.5 months | ■1,37,500
+UI/UX Designer | ■50,000/month | 1.5 months | ■75,000
+QA Tester | ■35,000/month | 1 month | ■35,000
+**Total Dev Cost** | **~■5,72,500**
+Infrastructure Cost (Monthly, Post-Launch)
+Service | Estimated Cost
+AWS EC2 (2× t3.medium) | ■12,000
+AWS RDS PostgreSQL (db.t3.small) | ■6,000
+AWS S3 + CloudFront (1TB/month) | ■4,000
+AWS MediaConvert (100 videos/month) | ■3,000
+
+---PAGE BREAK---
+KodetoCareer
+Implementation Plan
+KodetoCareer Platform — Document 7/10 — Confidential
+Page 11
+AWS SES (10,000 emails) | ■500
+Redis (ElastiCache t3.micro) | ■3,000
+Domain + SSL | ■2,000
+Firebase (FCM push) | Free
+MSG91 SMS (1000 OTPs) | ■800
+Sentry (error tracking) | Free
+**Total Monthly** | **~■31,300/month**
+---
+End of Implementation Plan
+
+---PAGE BREAK---

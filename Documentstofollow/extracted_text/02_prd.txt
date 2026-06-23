@@ -1,0 +1,377 @@
+KodetoCareer
+Product Requirements Document
+KodetoCareer Platform — Document 2/10 — Confidential
+Page 1
+KodetoCareer — Product Requirements
+Document (PRD)
+Version 1.0 | For Engineering and Design Teams
+---
+1. Document Purpose
+This PRD defines what the KodetoCareer Training & Placement Management Platform must do. It is the
+authoritative source of truth for product decisions during MVP development. Engineering teams should treat the
+acceptance criteria in each section as contractual requirements. Design teams should treat the user stories as
+the basis for every screen.
+---
+2. Product Overview
+Product Name: KodetoCareer Platform
+Platform Type: Multi-tenant SaaS (Web + Mobile)
+Primary Users: Students, Trainers, College Admins, KodetoCareer Super Admin
+MVP Timeline: 10 weeks
+MVP Goal: Onboard 3 pilot colleges with full learning and attendance management
+---
+3. User Roles & Permissions Matrix
+Feature Area | Super Admin | College Admin | Trainer | Student
+Create college | ■ | ■ | ■ | ■
+Create batch | ■ | ■ | ■ | ■
+Enroll students | ■ | View only | ■ | ■
+Upload content | ■ | ■ | ■ | ■
+Mark attendance | ■ | ■ | ■ | ■
+
+---PAGE BREAK---
+KodetoCareer
+Product Requirements Document
+KodetoCareer Platform — Document 2/10 — Confidential
+Page 2
+Take quizzes | ■ | ■ | ■ | ■
+View all colleges | ■ | ■ | ■ | ■
+View own college | ■ | ■ | ■ | ■
+Generate certificates | ■ | ■ | ■ | ■
+Upload offer letters | ■ | ■ | ■ | ■
+View placement stats | ■ | ■ | ■ | Own only
+Download reports | ■ | ■ | ■ | ■
+---
+4. Module-by-Module Requirements
+---
+MODULE 1: Authentication & Onboarding
+1.1 Student Registration & Login
+User Story:
+As a student, I want to log in with my email and password so that I can access my personalised learning
+dashboard.
+Functional Requirements:
+FR-1.1.1 — The system shall support email/password login for all user types.
+FR-1.1.2 — Students shall receive a unique 8-character student ID on registration (format: KTC-YYYY-XXXXX).
+FR-1.1.3 — On first login, students shall be shown a mandatory profile completion screen collecting: full name,
+phone number, profile photo, date of birth, current college, course enrolled.
+FR-1.1.4 — The system shall support OTP-based email verification before account activation.
+FR-1.1.5 — Forgotten password flow must complete within 3 steps: email entry → OTP → new password.
+FR-1.1.6 — All sessions shall expire after 30 days of inactivity with a warning shown at 25 days.
+FR-1.1.7 — The system shall support parallel login on one mobile device and one web browser simultaneously.
+Acceptance Criteria:
+ [ ] A new student can register, verify email, and reach their dashboard in under 2 minutes
+ 
+ [ ] An existing student can log in within 10 seconds on a 4G connection
+ 
+ [ ] OTP arrives within 60 seconds of request
+ 
+---PAGE BREAK---
+KodetoCareer
+Product Requirements Document
+KodetoCareer Platform — Document 2/10 — Confidential
+Page 3
+ [ ] Invalid login attempts are blocked after 5 failures for 15 minutes
+ 
+---
+1.2 Admin & Trainer Onboarding
+User Story:
+As a Super Admin, I want to create College Admin and Trainer accounts so that I can delegate management
+without sharing my credentials.
+Functional Requirements:
+FR-1.2.1 — Super Admin shall create College Admin accounts by entering name, email, college assignment, and
+phone number. The system auto-generates and emails a temporary password.
+FR-1.2.2 — Super Admin shall create Trainer accounts with name, email, phone, specialisation tags, and
+assigned colleges.
+FR-1.2.3 — First login for any admin type must trigger a forced password change.
+FR-1.2.4 — Admin accounts shall be deactivatable (not deletable) to preserve audit history.
+---
+MODULE 2: Course & Content Management
+2.1 Course Structure
+User Story:
+As a Super Admin or Trainer, I want to create structured courses with modules, lessons, and resources so that
+students follow a logical learning path.
+Functional Requirements:
+FR-2.1.1 — Courses shall have a three-level hierarchy: Course → Module → Lesson.
+FR-2.1.2 — Each Lesson may contain any combination of: video (MP4, YouTube link, or Vimeo link), PDF notes,
+external links, text content (rich text), and assignments.
+FR-2.1.3 — Lessons shall be orderable via drag-and-drop in the admin panel.
+FR-2.1.4 — Modules shall be lockable (student cannot access until previous module is completed).
+FR-2.1.5 — A course shall have: title, description, category tag, difficulty level
+(Beginner/Intermediate/Advanced), estimated duration, thumbnail image, and assigned trainer(s).
+FR-2.1.6 — Course publishing shall have three states: Draft, Review, Published.
+FR-2.1.7 — A course may be assigned to one or more batches.
+
+---PAGE BREAK---
+KodetoCareer
+Product Requirements Document
+KodetoCareer Platform — Document 2/10 — Confidential
+Page 4
+Acceptance Criteria:
+ [ ] Admin can create a complete 5-module course with lessons in under 30 minutes
+ 
+ [ ] Students cannot access locked modules until prerequisites are complete
+ 
+ [ ] A 500MB video upload completes within 5 minutes on a 10 Mbps connection
+ 
+---
+2.2 Video Management
+Functional Requirements:
+FR-2.2.1 — Uploaded videos shall be stored on AWS S3 and served via CloudFront CDN.
+FR-2.2.2 — The system shall support two video source types: direct upload (MP4 up to 2GB) and embedded
+URL (YouTube, Vimeo, Google Drive).
+FR-2.2.3 — Direct-upload videos shall be transcoded to adaptive bitrate (480p, 720p, 1080p) using AWS
+MediaConvert.
+FR-2.2.4 — Video player must support: playback speed control (0.5x to 2x), quality selection, fullscreen, and
+picture-in-picture.
+FR-2.2.5 — Student video watch progress shall be persisted so playback resumes from last position.
+FR-2.2.6 — Videos shall not be downloadable by students (stream-only delivery).
+FR-2.2.7 — Admin panel shall show per-video analytics: total views, average watch completion percentage.
+---
+2.3 Notes & Study Materials
+Functional Requirements:
+FR-2.3.1 — Trainers and Super Admins may upload PDF notes (max 50MB each) attached to any lesson.
+FR-2.3.2 — Students may download attached PDF notes.
+FR-2.3.3 — The system shall maintain a "My Notes" section where students can write personal text notes
+against any lesson.
+FR-2.3.4 — Student personal notes are private and not visible to trainers or admins.
+---
+MODULE 3: Batch & Attendance Management
+3.1 Batch Management
+
+---PAGE BREAK---
+KodetoCareer
+Product Requirements Document
+KodetoCareer Platform — Document 2/10 — Confidential
+Page 5
+User Story:
+As a Super Admin, I want to create batches that link students, a college, a course, and a trainer so that I can
+manage multiple training engagements simultaneously.
+Functional Requirements:
+FR-3.1.1 — A Batch shall have: batch name, start date, end date, assigned college, assigned course, assigned
+trainer(s), schedule (days and time), and mode (online/offline/hybrid).
+FR-3.1.2 — Students shall be bulk-imported to a batch via CSV upload. Required CSV columns: Full Name,
+Email, Phone, Enrollment Number.
+FR-3.1.3 — System shall validate CSV and show errors per row before import (duplicate email, missing fields).
+FR-3.1.4 — A student may be enrolled in multiple batches simultaneously.
+FR-3.1.5 — Batch capacity shall have a configurable maximum (default: 200 students).
+---
+3.2 Attendance System
+User Story:
+As a Trainer, I want to mark attendance for each class session so that the admin and college can see which
+students attended.
+Functional Requirements:
+FR-3.2.1 — Trainer can create a Class Session for a batch with: date, start time, end time, topic covered, and
+mode (online/offline).
+FR-3.2.2 — Attendance marking interface shall show all enrolled students in a list. Trainer marks
+Present/Absent/Late for each student.
+FR-3.2.3 — Trainer may mark attendance up to 24 hours after a session with a reason note.
+FR-3.2.4 — Super Admin may override any attendance record with an audit log entry.
+FR-3.2.5 — System shall auto-calculate attendance percentage per student per batch.
+FR-3.2.6 — Students with attendance below a configurable threshold (default: 75%) shall be flagged with a visual
+indicator on the admin dashboard.
+FR-3.2.7 — Students shall receive a push notification when attendance is marked for their batch.
+FR-3.2.8 — Attendance reports shall be exportable as Excel/PDF, filterable by batch, date range, and student.
+Acceptance Criteria:
+ [ ] A trainer can mark attendance for a 100-student batch in under 5 minutes
+ 
+ [ ] Attendance percentage is visible on the college dashboard within 1 minute of the trainer submitting
+ 
+---PAGE BREAK---
+KodetoCareer
+Product Requirements Document
+KodetoCareer Platform — Document 2/10 — Confidential
+Page 6
+---
+MODULE 4: Assessments (Quizzes & Assignments)
+4.1 Quiz/Test Engine
+User Story:
+As a Trainer, I want to create timed quizzes with multiple question types so that I can assess student
+understanding of each module.
+Functional Requirements:
+FR-4.1.1 — Quiz shall support question types: Multiple Choice (single answer), Multiple Choice (multiple
+answer), True/False, and Short Text Answer.
+FR-4.1.2 — Quiz settings: total marks, pass marks, time limit (optional), number of attempts allowed, shuffle
+questions, shuffle options.
+FR-4.1.3 — Questions shall be tagged with: topic tag, difficulty (Easy/Medium/Hard), and marks value.
+FR-4.1.4 — A question bank shall store all questions by course/topic. Trainers can create new quizzes by picking
+from the question bank.
+FR-4.1.5 — During an active quiz, the student's progress (current question, time remaining) shall auto-save
+every 30 seconds to prevent data loss on network interruption.
+FR-4.1.6 — On quiz submission, the system shall immediately display the score and correct answers
+(configurable: show answers immediately or after deadline).
+FR-4.1.7 — Leaderboard for each quiz showing top 10 performers shall be visible to all batch students after the
+deadline.
+FR-4.1.8 — Admin and Trainer can view per-question analytics: what percentage of students answered correctly.
+---
+4.2 Assignments
+Functional Requirements:
+FR-4.2.1 — Assignments shall have: title, description, deadline, total marks, and file submission option.
+FR-4.2.2 — Students submit assignments as file upload (PDF, ZIP, DOCX) with an optional text note.
+FR-4.2.3 — Trainer reviews submissions and enters marks with written feedback.
+FR-4.2.4 — Students are notified when their assignment is graded.
+FR-4.2.5 — Late submissions are accepted but marked as "Late" with a timestamp.
+
+---PAGE BREAK---
+KodetoCareer
+Product Requirements Document
+KodetoCareer Platform — Document 2/10 — Confidential
+Page 7
+---
+MODULE 5: Progress Tracking & Analytics
+5.1 Student Progress Dashboard
+Functional Requirements:
+FR-5.1.1 — Student dashboard shall show: overall course completion percentage, attendance rate, quiz average
+score, assignment completion rate, current streak (consecutive days of activity), and placement readiness score
+(composite metric).
+FR-5.1.2 — A per-module progress breakdown shall show completion status of every lesson and assessment.
+FR-5.1.3 — A "Weekly Activity" heatmap (GitHub-style) shall show study activity over the last 12 weeks.
+FR-5.1.4 — Students shall see a "Skill Level" indicator per topic (Beginner/Intermediate/Advanced) computed
+from quiz scores.
+---
+5.2 Admin Analytics Dashboard
+Functional Requirements:
+FR-5.2.1 — Super Admin dashboard shall show: total active students, total active colleges, total active batches,
+students placed this month, average attendance across all batches, and revenue summary.
+FR-5.2.2 — College-level drill-down shows all metrics for a single college.
+FR-5.2.3 — Admin can filter any report by: college, batch, date range, course, and trainer.
+FR-5.2.4 — A "Students at Risk" report flags students with: attendance < 75%, quiz average < 40%, or zero
+activity in the last 14 days.
+FR-5.2.5 — All reports shall be exportable to PDF and Excel.
+---
+MODULE 6: Certificates & Documents
+6.1 Certificate Generation
+User Story:
+As a Super Admin, I want to generate completion certificates for students who finish a course and meet the
+minimum criteria so that they have verifiable proof of their training.
+
+---PAGE BREAK---
+KodetoCareer
+Product Requirements Document
+KodetoCareer Platform — Document 2/10 — Confidential
+Page 8
+Functional Requirements:
+FR-6.1.1 — Certificate eligibility criteria (configurable per course): minimum attendance percentage, minimum
+quiz average score, all mandatory assignments submitted.
+FR-6.1.2 — Certificates shall be generated as PDF with: student name, course name, completion date, unique
+certificate ID (QR code), trainer name, and KodetoCareer authorised signature and seal.
+FR-6.1.3 — Certificate ID shall be verifiable at a public URL (no login required):
+verify.kodetocareer.com/[certificate-id]
+FR-6.1.4 — Student receives the certificate in their Student Portal under "My Certificates" and via email.
+FR-6.1.5 — Students can share their certificate as a direct link to LinkedIn or via WhatsApp.
+FR-6.1.6 — Bulk certificate generation for an entire batch shall complete within 5 minutes.
+---
+6.2 Offer Letter & Internship Letter Storage
+Functional Requirements:
+FR-6.2.1 — Super Admin may upload offer letters and internship letters against a specific student's profile.
+FR-6.2.2 — Student sees their uploaded letters under "My Documents" in the portal.
+FR-6.2.3 — Letters are stored as PDFs. Students can download but not delete.
+FR-6.2.4 — Placement record associated with an offer letter requires: company name, role/designation, package
+(annual CTC), offer date, joining date, and offer type (Internship/Full-Time/Contract).
+---
+MODULE 7: Placement Management
+7.1 Placement Tracking
+Functional Requirements:
+FR-7.1.1 — Each student has a placement status: Not Started | Preparing | Actively Applying | Placed | On Hold.
+FR-7.1.2 — Admin can log placement activity: interview rounds, offer received, offer accepted.
+FR-7.1.3 — Placement dashboard shows: total students placed this year, average package, company-wise
+breakdown, and month-wise trend chart.
+FR-7.1.4 — College Admin can see placement statistics for students from their college only.
+FR-7.1.5 — A "Placement Leaderboard" shows top placed students (visible to all students in their college with
+the student's consent).
+
+---PAGE BREAK---
+KodetoCareer
+Product Requirements Document
+KodetoCareer Platform — Document 2/10 — Confidential
+Page 9
+---
+7.2 Job Opportunities Board
+Functional Requirements:
+FR-7.2.1 — Admin can post job/internship opportunities with: company name, role, skills required, CTC/stipend,
+location, application deadline, and application link or email.
+FR-7.2.2 — Students see the job board filtered to opportunities matching their skill level.
+FR-7.2.3 — Students can mark interest ("I'm interested") on a job post, which notifies the admin.
+FR-7.2.4 — Job posts expire automatically after the deadline date.
+---
+MODULE 8: Communication System
+Functional Requirements:
+FR-8.1 — Super Admin and Trainers can send announcements to: all students, all students in a specific batch,
+all students in a specific college, or an individual student.
+FR-8.2 — Announcements appear in the app Notification Centre and trigger push notifications.
+FR-8.3 — System shall send automated email notifications for: new lesson available, quiz deadline approaching
+(24 hours before), assignment graded, certificate ready, attendance below threshold (to student and college
+admin).
+FR-8.4 — A bulk SMS option (via Twilio or MSG91) shall be available for critical communications.
+FR-8.5 — WhatsApp notification integration (via WhatsApp Business API or Interakt) shall be included in Version
+2.
+---
+MODULE 9: College Dashboard (Partner Portal)
+Functional Requirements:
+FR-9.1 — College Admin login shows a dashboard scoped to their college only.
+FR-9.2 — College dashboard shows: enrolled student count, active batch count, overall attendance rate,
+average quiz score, students placed, and pending actions (flagged students).
+FR-9.3 — College Admin can view individual student profiles (read-only).
+FR-9.4 — College Admin can download attendance reports, progress reports, and placement reports as
+PDF/Excel.
+
+---PAGE BREAK---
+KodetoCareer
+Product Requirements Document
+KodetoCareer Platform — Document 2/10 — Confidential
+Page 10
+FR-9.5 — College Admin cannot modify any student data — read and download only.
+FR-9.6 — College Admin receives a weekly automated email summary of their college's statistics.
+---
+5. Non-Functional Requirements
+Requirement | Target
+Page load time (web) | < 3 seconds on 4G
+API response time | < 500ms for 95th percentile
+Mobile app launch time | < 2 seconds (cold start)
+System uptime | 99.5% monthly
+Concurrent users supported | 10,000 in MVP, scalable to 100,000
+Data backup frequency | Daily automated backup to separate AWS region
+Video buffering | < 5 seconds to start playback on 4G
+File upload progress | Real-time progress indicator for uploads > 1MB
+Maximum supported file upload | 2GB for video, 50MB for PDF
+---
+6. MVP Scope vs. Future Scope
+Feature | MVP (v1) | Version 2 | Version 3
+Student login & dashboard | ■
+Course & content management | ■
+Attendance management | ■
+Quizzes & assignments | ■
+Certificate generation | ■
+Admin CRM panel | ■
+College dashboard | ■
+Placement tracking (basic) | ■
+Job board | ■
+Push notifications | ■
+
+---PAGE BREAK---
+KodetoCareer
+Product Requirements Document
+KodetoCareer Platform — Document 2/10 — Confidential
+Page 11
+Resume builder | ■
+AI mock interview | ■
+Coding assessment platform | ■
+WhatsApp automation | ■
+Recruiter portal | ■
+AI career guidance | ■
+AI coding mentor | ■
+Multi-language support | ■
+Third-party training partner licensing | ■
+---
+7. Success Metrics for MVP Launch
+Metric | Target at 3 months post-launch
+Colleges onboarded | 3 pilot colleges
+Active students | 500+
+Daily Active Users (students) | 40%+ of enrolled
+Quiz completion rate | > 70%
+Attendance marking compliance | 100% of sessions recorded
+Certificates generated | > 90% of eligible students
+Admin satisfaction score | > 4.0 / 5.0
+Student satisfaction score | > 4.2 / 5.0
+---
+End of Product Requirements Document
+Next document: Technical Requirements Document (TRD)
+
+---PAGE BREAK---

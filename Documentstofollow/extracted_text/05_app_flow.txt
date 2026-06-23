@@ -1,0 +1,542 @@
+KodetoCareer
+App Flow
+KodetoCareer Platform — Document 5/10 — Confidential
+Page 1
+KodetoCareer — App Flow Document
+Version 1.0 | For Design & Development Teams
+---
+1. Flow Overview
+This document maps every user journey through the KodetoCareer platform. Each section covers a specific user
+role and their core task flows. Screen names are in SCREAMING_SNAKE_CASE for handoff reference.
+---
+2. Global Navigation Structure
+2.1 Student App (Mobile — Flutter)
+Splash Screen (APP_SPLASH)
+■
+■■■ Not Logged In
+■   ■■■ ONBOARDING (first-time only, 3 swipeable slides)
+■   ■■■ LOGIN
+■   ■■■ REGISTER
+■   ■■■ EMAIL_VERIFY
+■   ■■■ FORGOT_PASSWORD → OTP_VERIFY → RESET_PASSWORD
+■
+■■■ Logged In
+    ■■■ Bottom Nav Bar (5 tabs)
+    ■   ■■■ ■ HOME (STUDENT_DASHBOARD)
+    ■   ■■■ ■ LEARN (COURSE_LIST)
+    ■   ■■■ ■ TESTS (QUIZ_LIST)
+    ■   ■■■ ■ PLACEMENT (PLACEMENT_HUB)
+    ■   ■■■ ■ PROFILE (MY_PROFILE)
+    ■
+    ■■■ Global: Notification Bell (top right) → NOTIFICATION_CENTER
+2.2 Web App — Admin Panel
+ADMIN_LOGIN
+■
+■■■ Super Admin
+    ■■■ Sidebar Navigation
+    ■   ■■■ ■ Dashboard (SUPER_ADMIN_DASHBOARD)
+    ■   ■■■ ■ Colleges (COLLEGE_MANAGEMENT)
+    ■   ■■■ ■ Students (STUDENT_MANAGEMENT)
+
+---PAGE BREAK---
+KodetoCareer
+App Flow
+KodetoCareer Platform — Document 5/10 — Confidential
+Page 2
+    ■   ■■■ ■ Trainers (TRAINER_MANAGEMENT)
+    ■   ■■■ ■ Courses (COURSE_MANAGEMENT)
+    ■   ■■■ ■ Batches (BATCH_MANAGEMENT)
+    ■   ■■■ ■ Assessments (ASSESSMENT_MANAGEMENT)
+    ■   ■■■ ■ Certificates (CERTIFICATE_MANAGEMENT)
+    ■   ■■■ ■ Placements (PLACEMENT_MANAGEMENT)
+    ■   ■■■ ■ Communication (COMMUNICATION_CENTER)
+    ■   ■■■ ■ Analytics (ANALYTICS_CENTER)
+    ■   ■■■ ■■ Settings (SYSTEM_SETTINGS)
+    ■
+    ■■■ College Admin (scoped to own college)
+        ■■■ COLLEGE_DASHBOARD
+        ■■■ STUDENT_LIST (read-only)
+        ■■■ ATTENDANCE_REPORTS
+        ■■■ PROGRESS_REPORTS
+        ■■■ PLACEMENT_REPORTS
+---
+3. Student Flows (Mobile App)
+Flow 3.1: Registration & Onboarding
+APP_SPLASH (2 seconds auto-advance)
+    ■
+    ■■■ First Install → ONBOARDING
+    ■       Slide 1: "Learn from anywhere" [illustration]
+    ■       Slide 2: "Track your progress" [illustration]
+    ■       Slide 3: "Get placed" [illustration]
+    ■       [Skip] or [Next] → REGISTER
+    ■
+    ■■■ Returning User → LOGIN
+REGISTER
+    Fields:
+     Full Name
+     Email
+     Password (show/hide toggle)
+     Confirm Password
+     [Register] Button
+    
+    → On Submit → EMAIL_VERIFY
+EMAIL_VERIFY
+     "Enter the 6-digit OTP sent to {email}"
+     OTP input (auto-advance on 6 digits)
+     [Resend OTP] (active after 60s countdown)
+     [Verify] Button
+    
+    → On Success → PROFILE_SETUP (first-time)
+PROFILE_SETUP (mandatory, can't skip)
+
+---PAGE BREAK---
+KodetoCareer
+App Flow
+KodetoCareer Platform — Document 5/10 — Confidential
+Page 3
+    Step 1 of 2 — Basic Info:
+     Phone Number
+     Date of Birth
+     Gender
+     Profile Photo (optional, camera or gallery)
+    [Next]
+    
+    Step 2 of 2 — Academic Info:
+     College (dropdown, searchable)
+     Branch/Stream
+     Year of Graduation
+     Enrollment Number
+    [Complete Profile] → STUDENT_DASHBOARD
+---
+Flow 3.2: Home Dashboard
+STUDENT_DASHBOARD
+    ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+    ■ Good morning, [Name] ■                  ■
+    ■ Placement Readiness: ■■■■■■■ 67%         ■
+    ■                                          ■
+    ■ CONTINUE LEARNING                        ■
+    ■ ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    ■
+    ■ ■ Python for ML — Module 3, Lesson 4■    ■
+    ■ ■ [Continue] ■■■■■■■■■■■■■■■■■■■   ■    ■
+    ■ ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■    ■
+    ■                                          ■
+    ■ TODAY'S SNAPSHOT                         ■
+    ■ ■ Attendance: 78%   ■ Tests: 2 pending ■
+    ■ ■ Rank in batch: #12                    ■
+    ■                                          ■
+    ■ UPCOMING                                 ■
+    ■  Quiz: Python Basics — Tomorrow, 7 PM   ■
+    ■  Assignment due — Fri, 11 PM            ■
+    ■                                          ■
+    ■ ANNOUNCEMENTS                            ■
+    ■  New session recording uploaded         ■
+    ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+Tap on "Continue Learning" → LESSON_PLAYER
+Tap on Quiz card → QUIZ_DETAIL
+Tap on Announcement → NOTIFICATION_CENTER
+---
+Flow 3.3: Learning Flow
+COURSE_LIST (Learn tab)
+     Filter tabs: All | In Progress | Completed
+     Each card: Course name, progress bar, % complete, trainer name
+
+---PAGE BREAK---
+KodetoCareer
+App Flow
+KodetoCareer Platform — Document 5/10 — Confidential
+Page 4
+    → Tap course → COURSE_DETAIL
+COURSE_DETAIL
+     Course header: thumbnail, title, description, trainer
+     "My Progress" bar
+     Tab 1: Modules (collapsed list)
+     Tab 2: Resources (all PDFs)
+     Tab 3: About (trainer bio, syllabus)
+    
+    → Tap module → MODULE_EXPANDED (accordion opens in place)
+MODULE_EXPANDED
+     Module title
+     Lesson list:
+      ■ Lesson 1 — Introduction (completed)
+      ■■ Lesson 2 — Variables (in progress)
+      ■ Lesson 3 — Loops (locked)
+    
+    → Tap lesson → LESSON_DETAIL
+LESSON_DETAIL
+     Lesson title
+     Tab 1: Video (if video lesson)
+     Tab 2: Notes (PDFs to download)
+     Tab 3: My Notes (personal note editor)
+    
+    → Tap video area → LESSON_PLAYER
+LESSON_PLAYER (full screen)
+     Video player with custom controls
+     Bottom overlay: 
+      - Progress bar (scrubable)
+      - ■ 10s back | ■■/■ Play | ■ 10s forward
+      - Speed selector (0.75x, 1x, 1.25x, 1.5x, 2x)
+      - Quality selector
+      - PiP (picture-in-picture button)
+     [✓ Mark Complete] button (appears after 80% watched)
+    
+    → Tap Back → LESSON_DETAIL (progress saved)
+    → Tap Mark Complete → 
+        If last lesson in module AND next module unlocked:
+            CONFETTI ANIMATION + "Module Complete!" bottom sheet
+        If course complete → COURSE_COMPLETE_SCREEN
+---
+Flow 3.4: Quiz Flow
+QUIZ_LIST (Tests tab)
+     Filter: Upcoming | In Progress | Completed
+     Each card: Quiz name, date, time limit, marks, status
+    
+    → Tap quiz → QUIZ_DETAIL
+QUIZ_DETAIL
+
+---PAGE BREAK---
+KodetoCareer
+App Flow
+KodetoCareer Platform — Document 5/10 — Confidential
+Page 5
+     Quiz title, course, module
+     Stats: Questions, Time limit, Total marks, Pass marks, Attempts
+     If not started: [Start Quiz] button
+     If completed: Score card, [View Results]
+     If in progress (auto-save): [Resume Quiz]
+PRE-QUIZ CONFIRMATION (bottom sheet)
+    "Ready to start?"
+     Once started, timer cannot be paused
+     You have X attempts remaining
+    [Cancel] [Start Quiz]
+    
+    → Tap Start Quiz → QUIZ_SCREEN
+QUIZ_SCREEN
+    ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+    ■ Question 3 of 15        ■ 12:34          ■
+    ■ ■■■■■■■■■■■■■■■                           ■
+    ■                                           ■
+    ■ What is the output of:                    ■
+    ■ print(type(3.14))                         ■
+    ■                                           ■
+    ■ ● <class 'int'>                           ■
+    ■ ● <class 'float'>    ■ selected           ■
+    ■ ● <class 'str'>                           ■
+    ■ ● <class 'number'>                        ■
+    ■                                           ■
+    ■ [Previous]            [Next →]            ■
+    ■           [Submit Quiz]                   ■
+    ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+    
+     Auto-save every 30 seconds
+     Timer warning at 5 minutes remaining (screen border turns yellow)
+     Timer warning at 1 minute remaining (screen border turns red, vibration)
+    
+    → Tap Submit → SUBMIT_CONFIRMATION
+    
+SUBMIT_CONFIRMATION (bottom sheet)
+    "Submit quiz?"
+    "You have answered 13/15 questions. 2 unanswered."
+    [Review Answers] [Submit Now]
+QUIZ_RESULT
+    ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+    ■                                           ■
+    ■         ■  72 / 100                      ■
+    ■          You Passed!                      ■
+    ■                                           ■
+    ■  Time Taken: 18m 34s                      ■
+    ■  Correct: 12/15   Wrong: 2   Skipped: 1   ■
+    ■                                           ■
+    ■  Your rank in batch: #5                   ■
+    ■                                           ■
+    ■  [View Answer Sheet]  [View Leaderboard]  ■
+    ■                                           ■
+    ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+
+---PAGE BREAK---
+KodetoCareer
+App Flow
+KodetoCareer Platform — Document 5/10 — Confidential
+Page 6
+ANSWER_REVIEW_SCREEN
+     Each question listed with student's answer
+     ■ Green for correct, ■ Red for wrong
+     Explanation shown below each question
+---
+Flow 3.5: Placement Hub
+PLACEMENT_HUB (Placement tab)
+    ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+    ■  My Placement Status: PREPARING          ■
+    ■  Placement Readiness Score: 67/100       ■
+    ■  ■■■■■■■■■■  Progress breakdown →         ■
+    ■                                           ■
+    ■  QUICK ACTIONS                            ■
+    ■  [■ My Resume] [■ Mock Prep] [■ Jobs] ■
+    ■                                           ■
+    ■  MY DOCUMENTS                             ■
+    ■   Python ML Certificate (Download)       ■
+    ■   Offer Letter — TechCorp (Download)     ■
+    ■                                           ■
+    ■  JOB OPPORTUNITIES                        ■
+    ■  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  ■
+    ■  ■ Junior Python Developer            ■  ■
+    ■  ■ InnoTech Solutions  ■3.5 LPA      ■  ■
+    ■  ■ Skills: Python, Django, REST API   ■  ■
+    ■  ■ Deadline: Dec 31 [I'm Interested]  ■  ■
+    ■  ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■  ■
+    ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+Tap "Jobs" → JOB_BOARD (filtered list)
+Tap job card → JOB_DETAIL
+Tap "I'm Interested" → Confirm bottom sheet → Interest recorded
+MY_CERTIFICATES
+     List of earned certificates
+     Each: Course name, date, [View PDF] [Share]
+     Share action: opens native share sheet
+CERTIFICATE_VIEWER
+     Full-screen PDF viewer
+     [Download] [Share to LinkedIn] [Copy Verify Link]
+---
+Flow 3.6: Profile
+MY_PROFILE
+     Profile photo, name, student code
+     Quick stats: Courses, Attendance%, Quiz Avg, Rank
+     Tabs:
+      - Personal Info (editable)
+
+---PAGE BREAK---
+KodetoCareer
+App Flow
+KodetoCareer Platform — Document 5/10 — Confidential
+Page 7
+      - Academic Info (editable)
+      - Skills (tag list, editable)
+      - Certificates
+      - Documents
+    
+     Settings section:
+      - Notification preferences
+      - Change password
+      - About / Help
+      - [Logout]
+---
+4. Admin Panel Flows (Web — React.js)
+Flow 4.1: Super Admin Dashboard
+SUPER_ADMIN_DASHBOARD
+    Top KPIs row:
+    [Total Students: 1,234] [Active Colleges: 8] [Active Batches: 23] [Placed This Mont...
+    
+    Charts row:
+    [Monthly Enrollment Trend (line)] [Placement by Company (bar)] [Attendance Distribu...
+    
+    Alerts panel:
+    "Students at risk" table:
+     Ravi Sharma — LNCT Batch 2 — Attendance 62% — Last active 8 days ago
+     [Send Alert] [View Profile]
+    
+    Quick Actions:
+    [+ Add College] [+ Add Batch] [Generate Certificates] [+ Post Job]
+---
+Flow 4.2: College Management
+COLLEGE_MANAGEMENT (List view)
+    Table: Name | Code | City | Students | Active Batches | Status | Actions
+    [+ Add College] button (top right)
+    Filter: All | Active | Inactive
+    Search: by name or code
+    
+    → Click [+ Add College] → COLLEGE_CREATE_FORM (slide-in panel)
+    → Click college row → COLLEGE_DETAIL
+COLLEGE_CREATE_FORM
+    Basic Info:
+     College Name *
+     College Code * (auto-suggested from name)
+     City, State, Pincode
+
+---PAGE BREAK---
+KodetoCareer
+App Flow
+KodetoCareer Platform — Document 5/10 — Confidential
+Page 8
+    Contact:
+     Contact Person Name
+     Contact Email *
+     Contact Phone
+    Contract:
+     Onboarding Date
+     Contract Start / End
+    Admin Account:
+     [Create College Admin Account] toggle
+      → If ON: Admin Name, Admin Email fields appear
+    [Cancel] [Save College]
+COLLEGE_DETAIL (tabbed)
+    Header: College name, code, status badge, [Edit] [Deactivate]
+    
+    Tab 1 — Overview:
+     Key metrics cards: Students, Active Batches, Placement Rate, Avg Attendance
+     Trend charts for this college
+    
+    Tab 2 — Batches:
+     Table of batches for this college
+     [+ New Batch for this college]
+    
+    Tab 3 — Students:
+     Table of students enrolled in this college's batches
+     Filter by batch, placement status
+    
+    Tab 4 — Reports:
+     [Download Attendance Report (PDF)]
+     [Download Progress Report (Excel)]
+     [Download Placement Report (PDF)]
+---
+Flow 4.3: Batch Creation & Management
+BATCH_MANAGEMENT (List)
+    Table: Batch Name | College | Course | Trainer | Students | Start | End | Status
+    Filter: Upcoming | Active | Completed
+    
+    → [+ Create Batch] → BATCH_CREATE_WIZARD (3 steps)
+BATCH_CREATE_WIZARD
+    Step 1 — Basic Details:
+     Batch Name *
+     Batch Code * (auto-generated: [COURSE_CODE]-[COLLEGE_CODE]-[YEAR]-B[n])
+     Select College *
+     Select Course *
+     Start Date, End Date *
+     Mode: Online / Offline / Hybrid
+     Schedule Days (multi-select: Mon, Tue, Wed, Thu, Fri, Sat, Sun)
+     Schedule Time (e.g., 6:00 PM – 8:00 PM)
+     Capacity (default: 200)
+
+---PAGE BREAK---
+KodetoCareer
+App Flow
+KodetoCareer Platform — Document 5/10 — Confidential
+Page 9
+     Meet Link (optional)
+    [Next →]
+    
+    Step 2 — Assign Trainers:
+     Search and select Primary Trainer
+     Option: + Add secondary trainer
+    [← Back] [Next →]
+    
+    Step 3 — Enroll Students:
+     Option A: CSV Upload
+      [Download Template] [Upload CSV]
+      Preview table shows after upload: validates rows, flags errors
+     Option B: Add individually (search by email)
+     Summary: "X students will be enrolled"
+    [← Back] [Create Batch]
+    
+    → Success → BATCH_DETAIL
+---
+Flow 4.4: Attendance Marking (Trainer Flow)
+TRAINER LOGIN → TRAINER_DASHBOARD
+    My Today's Classes:
+     Batch: PY-AI-2024 — 6 PM–8 PM
+    [Mark Attendance]
+    
+    → ATTENDANCE_MARKING_SCREEN
+ATTENDANCE_MARKING_SCREEN
+    Header: Batch name | Date | Today's topic (editable)
+    
+    Student list (all enrolled students):
+    ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+    ■ # ■ Student Name    ■ P / A / L ■ Note       ■
+    ■ 1 ■ Rahul Gupta     ■ ●  ■   ■  ■            ■
+    ■ 2 ■ Priya Sharma    ■ ■  ●   ■  ■            ■
+    ■ 3 ■ Amit Verma      ■ ■  ■   ●  ■ [Late]     ■
+    ■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+    
+     Bulk action: [Mark All Present] button
+     Search by name
+     Count shows: Present: 24 | Absent: 2 | Late: 1
+    
+    [Submit Attendance] → Confirmation dialog → SUCCESS
+    → College dashboard updates within 60 seconds
+---
+Flow 4.5: Certificate Generation
+CERTIFICATE_MANAGEMENT
+    → Select batch → [Generate Certificates]
+
+---PAGE BREAK---
+KodetoCareer
+App Flow
+KodetoCareer Platform — Document 5/10 — Confidential
+Page 10
+    CERTIFICATE_ELIGIBILITY_CHECK
+    System shows table:
+    Student Name | Attendance% | Quiz Avg | Assignments | Eligible?
+    Rahul Gupta  |    82%      |   74%    |    ■        |   ■
+    Priya Sharma |    68%      |   74%    |    ■        |   ■ (Attendance)
+    
+    Filter: Eligible | Ineligible | All
+    
+     For ineligible: hover tooltip shows reason
+     Admin can manually override: [Override] → requires reason text
+    
+    [Generate for Eligible Students (24)] → LOADING
+    
+    GENERATION_PROGRESS (live updates via socket)
+     Progress bar: Generating certificates...
+     "23 / 24 generated"
+    
+    → Complete → DOWNLOAD ALL (ZIP)
+    → Each student notified via push + email
+---
+5. College Admin Portal Flow (Web)
+COLLEGE_ADMIN_LOGIN → COLLEGE_DASHBOARD
+COLLEGE_DASHBOARD
+    Header: Welcome, [Admin Name] — [College Name]
+    
+    KPI Row: [Students: 245] [Batches: 3] [Avg Attendance: 76%] [Placed: 38]
+    
+    Student Risk Table:
+     Low Attendance (<75%): 12 students [View All]
+     No Activity (14+ days): 5 students [View All]
+    
+    Report Downloads:
+    [■ Attendance Report] [■ Progress Report] [■ Placement Report]
+STUDENT_LIST (read-only)
+    Table: Name | Batch | Attendance% | Quiz Avg | Placement Status
+    Filter: by batch, by status
+    Search: by name, enrollment number
+    
+    → Click student row → STUDENT_PROFILE_READONLY
+    
+STUDENT_PROFILE_READONLY
+     All student data visible (no edit capability)
+     Attendance chart
+     Quiz scores
+     Lesson completion
+     Documents and certificates
+    → [Download Student Report (PDF)]
+
+---PAGE BREAK---
+KodetoCareer
+App Flow
+KodetoCareer Platform — Document 5/10 — Confidential
+Page 11
+---
+6. Notification Flows
+NOTIFICATION TRIGGERS & DESTINATIONS:
+Event: Student marks lesson complete
+  → Activity log updated (silent, no notification)
+Event: Quiz deadline approaches (24 hours before)
+  → Push notification to student
+  → Email to student
+Event: Trainer submits attendance
+  → Push to all students in batch ("Attendance for [date] marked")
+  → If student attendance < 75%: additional warning push
+Event: Assignment graded
+  → Push + email to student ("Your [Assignment Name] has been graded: X/Y marks")
+Event: Certificate generated
+  → Push + email to student ("Your [Course] certificate is ready!")
+Event: New job posted (matching skills)
+  → Push to matching students
+Event: Weekly report (Sunday 8 PM auto)
+  → Email to all college admins (their college stats)
+  → Email to super admin (platform-wide stats)
+Event: Student at risk (weekly check)
+  → Email to super admin + college admin listing at-risk students
+---
+End of App Flow Document
+
+---PAGE BREAK---

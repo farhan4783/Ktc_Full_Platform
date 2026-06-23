@@ -1,0 +1,537 @@
+KodetoCareer
+UI/UX Brief
+KodetoCareer Platform — Document 6/10 — Confidential
+Page 1
+KodetoCareer — UI/UX Design Brief
+Version 1.0 | For Design Team
+---
+1. Design Philosophy
+The KodetoCareer platform must feel professional, trustworthy, and motivating — not like a generic ed-tech
+template. Students in tier-2 and tier-3 colleges are comparing this to BYJU's, YouTube, and Instagram. The
+design must earn their daily engagement.
+Three Design Principles:
+1. Progress is Visible at All Times
+Every screen should answer "How am I doing?" before the user asks. Progress bars, streak counters, rank
+badges, and skill indicators must be persistent and satisfying. When a student completes something, the
+interface celebrates it.
+2. Clarity Over Cleverness
+Every trainer and college admin using the admin panel may not be technically sophisticated. Navigation must be
+obvious. Labels must be plain language. No icon-only buttons without labels. Every action must have a
+confirmation and a success state.
+3. India-First Design
+Design for variable connectivity. Skeletons over spinners. Offline-first for previously viewed content. Compress
+and lazy-load aggressively. Support right-to-left layouts from day one even if not launched. Respect data
+consciousness: show "this video is 45MB" before streaming.
+---
+2. Brand Identity
+2.1 Brand Personality
+ Confident — not arrogant. A mentor who believes in the student.
+ 
+ Modern — reflects contemporary tech industry aesthetics, not traditional educational imagery.
+ 
+ Warm — achieves professional tone without feeling cold or corporate.
+ 
+ Achievement-focused — every visual element should imply progress and success.
+ 
+---PAGE BREAK---
+KodetoCareer
+UI/UX Brief
+KodetoCareer Platform — Document 6/10 — Confidential
+Page 2
+2.2 Logo Usage
+ Primary logo: "KodetoCareer" wordmark with code icon integrated into the 'K'
+ 
+ Icon-only version for app icon and favicons
+ 
+ Minimum size: 120px wide for horizontal, 32px for icon-only
+ 
+ Never stretch, recolour, or place on busy backgrounds
+ 
+---
+3. Colour System
+3.1 Primary Palette
+Primary Blue      #1E3A8A    — Main CTAs, links, active states
+Light Blue        #3B82F6    — Hover states, secondary highlights
+Accent Green      #10B981    — Success states, completed items, "passed" badges
+Warning Amber     #F59E0B    — Alerts, pending actions, "at risk" indicators
+Danger Red        #EF4444    — Errors, failed states, "below threshold" alerts
+3.2 Neutral Palette
+Background        #F8FAFC    — App background (light mode)
+Surface           #FFFFFF    — Cards, modals, panels
+Border            #E2E8F0    — Dividers, card borders
+Text Primary      #0F172A    — Headlines, primary content
+Text Secondary    #475569    — Labels, descriptions, metadata
+Text Disabled     #94A3B8    — Disabled states, placeholder text
+3.3 Dark Mode (Mobile App — Phase 2)
+Background        #0F172A
+Surface           #1E293B
+Border            #334155
+Text Primary      #F1F5F9
+Text Secondary    #94A3B8
+3.4 Semantic Colour Usage
+Situation | Colour | Use Case
+Completed | #10B981 (Green) | Lesson done, quiz passed, certificate issued
+In Progress | #3B82F6 (Blue) | Active lesson, ongoing quiz attempt
+Pending | #F59E0B (Amber) | Assignment due, quiz approaching
+Failed / At Risk | #EF4444 (Red) | Quiz failed, attendance below threshold
+
+---PAGE BREAK---
+KodetoCareer
+UI/UX Brief
+KodetoCareer Platform — Document 6/10 — Confidential
+Page 3
+Locked | #94A3B8 (Grey) | Locked module, unavailable feature
+Not Started | #CBD5E1 (Light Grey) | Not yet begun lesson/module
+---
+4. Typography
+4.1 Type Scale
+Mobile App (Flutter):
+Role | Font | Size | Weight
+Display | Inter | 28px | 700 Bold
+Heading 1 | Inter | 22px | 700 Bold
+Heading 2 | Inter | 18px | 600 SemiBold
+Heading 3 | Inter | 16px | 600 SemiBold
+Body Large | Inter | 15px | 400 Regular
+Body | Inter | 14px | 400 Regular
+Caption | Inter | 12px | 400 Regular
+Label | Inter | 12px | 500 Medium
+Button | Inter | 14px | 600 SemiBold
+Web Admin Panel (React):
+Role | Font | Size | Weight
+Page Title | Inter | 24px | 700 Bold
+Section Header | Inter | 18px | 600 SemiBold
+Table Header | Inter | 13px | 600 SemiBold
+Table Cell | Inter | 14px | 400 Regular
+Body | Inter | 14px | 400 Regular
+Caption | Inter | 12px | 400 Regular
+Button | Inter | 13px | 600 SemiBold
+Font Source: Google Fonts — Inter (all weights)
+Code Font: JetBrains Mono (for code snippets in lessons)
+
+---PAGE BREAK---
+KodetoCareer
+UI/UX Brief
+KodetoCareer Platform — Document 6/10 — Confidential
+Page 4
+4.2 Line Heights
+ Headings: 1.2
+ 
+ Body text: 1.6
+ 
+ Table cells: 1.4
+ 
+---
+5. Spacing System
+Uses an 8px base grid. All spacing values are multiples of 8 (with 4px as a half-step).
+4px    — xs  (icon internal padding, inline elements)
+8px    — sm  (component internal spacing)
+12px   — md- (list item gap)
+16px   — md  (card padding, section gaps)
+24px   — lg  (section padding)
+32px   — xl  (page section gaps)
+48px   — 2xl (major section separators)
+64px   — 3xl (hero areas)
+---
+6. Component Library
+6.1 Buttons
+Primary Button
+ Background: #1E3A8A | Text: White
+ 
+ Hover: #1E40AF | Active: #1E3A8A + scale(0.98)
+ 
+ Disabled: #94A3B8 background, no cursor
+ 
+ Height: 48px (mobile), 40px (web)
+ 
+ Border radius: 8px
+ 
+ Full width on mobile, auto-width on web
+ 
+Secondary Button
+ Background: White | Border: #1E3A8A | Text: #1E3A8A
+ 
+ Hover: #EFF6FF background
+ 
+Danger Button
+ Background: #EF4444 | Text: White
+ 
+ Used only for destructive actions (deactivate, delete)
+ 
+---PAGE BREAK---
+KodetoCareer
+UI/UX Brief
+KodetoCareer Platform — Document 6/10 — Confidential
+Page 5
+ Requires confirmation dialog
+ 
+Ghost Button
+ No background or border | Text: #1E3A8A
+ 
+ Used for tertiary actions
+ 
+Icon Button
+ 40×40px touch target minimum on mobile
+ 
+ Always has an accessible aria-label
+ 
+6.2 Cards
+Standard Card
+ Background: #FFFFFF
+ 
+ Border: 1px solid #E2E8F0
+ 
+ Border radius: 12px
+ 
+ Shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04)
+ 
+ Padding: 16px
+ 
+Metric Card (KPI)
+ Same as standard but with coloured left border (4px) matching metric type
+ 
+ Icon top-left, value large (24px Bold), label below (12px Secondary)
+ 
+Course Card (mobile)
+ Thumbnail 16:9 top section
+ 
+ Course name, progress bar, completion %, trainer name
+ 
+ Tap entire card to navigate
+ 
+ Skeleton loader: show animated grey placeholder while loading
+ 
+6.3 Form Elements
+Input Field
+ Height: 48px (mobile), 40px (web)
+ 
+ Border: 1px solid #CBD5E1
+ 
+ Focus border: 2px solid #1E3A8A
+ 
+ Error border: 2px solid #EF4444
+ 
+ Error message: 12px Red below field
+ 
+ Label: 13px Medium, above field, 4px gap
+ 
+ Placeholder: #94A3B8
+ 
+Dropdown / Select
+
+---PAGE BREAK---
+KodetoCareer
+UI/UX Brief
+KodetoCareer Platform — Document 6/10 — Confidential
+Page 6
+ Same styling as input
+ 
+ Custom dropdown panel with search for lists > 10 items
+ 
+ Multi-select with chips (tag removable with ×)
+ 
+Toggle / Switch
+ Off: #CBD5E1 | On: #1E3A8A
+ 
+ 24×14px (web), 28×16px (mobile)
+ 
+Checkbox & Radio
+ Custom styled (not browser default)
+ 
+ Selected state: #1E3A8A fill with white checkmark
+ 
+ Accessible: visible focus ring on keyboard navigation
+ 
+6.4 Data Display
+Table (Admin Web)
+ Header row: #F8FAFC background, 13px SemiBold
+ 
+ Row height: 52px
+ 
+ Alternating row colour (subtle): every other row #F8FAFC
+ 
+ Hover state: #F1F5F9 row background
+ 
+ Action buttons always in last column
+ 
+ Sticky header on scroll
+ 
+ Empty state: illustration + message + action button
+ 
+Progress Bar
+ Height: 8px (standard), 4px (compact)
+ 
+ Track: #E2E8F0
+ 
+ Fill: gradient from #3B82F6 to #1E3A8A
+ 
+ Shows percentage label at end of bar
+ 
+Badge / Tag
+ Height: 22px
+ 
+ Rounded pill (border-radius: 100px)
+ 
+ Size: 11px SemiBold, uppercase
+ 
+ Colour variants: Green (success), Amber (warning), Red (danger), Blue (info), Grey (neutral)
+ 
+6.5 Navigation
+Mobile Bottom Navigation
+ 5 tabs maximum
+ 
+---PAGE BREAK---
+KodetoCareer
+UI/UX Brief
+KodetoCareer Platform — Document 6/10 — Confidential
+Page 7
+ Active tab: #1E3A8A icon + label
+ 
+ Inactive tab: #94A3B8 icon + label
+ 
+ Active indicator: 3px top border on tab
+ 
+ Tab bar background: White with top border
+ 
+Web Sidebar
+ Width: 240px (expanded), 64px (collapsed)
+ 
+ Background: #0F172A (dark)
+ 
+ Active item: #1E3A8A left indicator + #1E293B background
+ 
+ Hover: #1E293B background
+ 
+ Section dividers: 16px gap + small label in #475569
+ 
+ Logo area: top 64px
+ 
+ Collapsible on desktop (saves to localStorage)
+ 
+6.6 Empty States
+Every list, table, or content area must have a designed empty state:
+ Illustration (simple line art, consistent style)
+ 
+ Title: "No [items] yet"
+ 
+ Description: what would appear here and why it's empty
+ 
+ Primary action button if applicable
+ 
+Examples:
+ No students enrolled: "No students in this batch yet" + [Import Students]
+ 
+ No quizzes created: "No quizzes for this course" + [Create Quiz]
+ 
+ No notifications: "You're all caught up!" + illustration of checkmark
+ 
+6.7 Loading States
+Skeleton Screens (preferred over spinners for content loading):
+ Grey animated gradient rectangles matching the shape of content
+ 
+ Used for: course list, student table, dashboard metrics
+ 
+Spinner (for actions/button states):
+ 24px circular spinner in Primary Blue
+ 
+ Appears in button while API call is in flight
+ 
+ Button text changes to "Saving..." during load
+ 
+Progress Indicator (for uploads):
+ Linear progress bar with percentage
+ 
+---PAGE BREAK---
+KodetoCareer
+UI/UX Brief
+KodetoCareer Platform — Document 6/10 — Confidential
+Page 8
+ Estimated time remaining for large files
+ 
+ Cancel button for uploads > 10 seconds
+ 
+---
+7. Iconography
+Icon Library: Lucide Icons (open source, consistent stroke weight)
+Style: Outline (not filled) for UI icons
+Size: 20px standard, 16px compact, 24px feature icons
+Colour: Inherits from text colour or specific semantic colour
+Never: Use more than one icon style in the same screen
+Feature Icon Set (24px, custom illustrations):
+These are used in onboarding, empty states, and feature cards:
+ Learning / Books
+ 
+ Certificate / Badge
+ 
+ Placement / Briefcase
+ 
+ Quiz / Document-check
+ 
+ Attendance / Calendar-check
+ 
+ Progress / Bar-chart
+ 
+ Community / Users
+ 
+---
+8. Mobile-Specific Design
+8.1 Touch Targets
+ Minimum touch target: 44×44px for all interactive elements
+ 
+ Increase hit area with padding, not visual size
+ 
+8.2 Gestures
+ Swipe right: Go back (matches iOS/Android native behaviour)
+ 
+ Pull to refresh: Refresh current list
+ 
+ Long press on list items: Show context menu (delete, edit)
+ 
+ Swipe to dismiss: Notifications in notification centre
+ 
+---PAGE BREAK---
+KodetoCareer
+UI/UX Brief
+KodetoCareer Platform — Document 6/10 — Confidential
+Page 9
+8.3 Status Bar
+ Light content on dark header
+ 
+ Use SystemChrome.setSystemUIOverlayStyle in Flutter
+ 
+8.4 Safe Areas
+ All layouts must respect SafeArea widget in Flutter
+ 
+ Bottom navigation must account for iPhone home indicator
+ 
+8.5 Keyboard Behaviour
+ All forms scroll up when keyboard appears
+ 
+ "Next" keyboard action moves to next field
+ 
+ "Done" keyboard action on last field submits or closes
+ 
+---
+9. Motion & Animation
+Guiding Principle: Animation confirms state changes, guides attention, and rewards achievement. It should
+never slow the user down.
+Animation | Duration | Easing | Usage
+Screen transition | 250ms | ease-in-out | Route changes
+Modal / Bottom sheet enter | 300ms | ease-out | Modal appearance
+Modal dismiss | 200ms | ease-in | Modal dismiss
+Button press | 100ms | ease | Scale press effect
+Toast notification | 200ms enter, 150ms exit | ease | Toast alerts
+Skeleton to content | 200ms | ease | Content loaded
+Progress bar fill | 600ms | ease-out | On load / update
+Confetti / Celebration | 1500ms | custom | Lesson complete, certificate
+Achievement animations (Flutter + Lottie):
+ Lesson complete: subtle checkmark animation (500ms)
+ 
+ Module complete: medium celebration animation (1000ms)
+ 
+ Course complete: full confetti celebration (2000ms)
+ 
+ Certificate earned: golden glow animation (1500ms)
+ 
+---
+
+---PAGE BREAK---
+KodetoCareer
+UI/UX Brief
+KodetoCareer Platform — Document 6/10 — Confidential
+Page 10
+10. Accessibility
+ Colour contrast: All text meets WCAG AA minimum (4.5:1 for body, 3:1 for large text)
+ 
+ Screen reader support: All images have alt text, all icons have labels
+ 
+ Focus management: Keyboard navigation must work on all interactive elements on web
+ 
+ Font scaling: UI must not break at 150% text size on mobile
+ 
+ Error identification: Never use colour alone to indicate errors — always pair with text or icon
+ 
+---
+11. Screen-by-Screen Design Notes
+Student App Screens
+STUDENT_DASHBOARD
+ Hero card with gradient background (#1E3A8A → #3B82F6)
+ 
+ "Continue Learning" card is the largest element — thumb-accessible on mobile
+ 
+ Placement readiness score: circular progress indicator with animated fill
+ 
+LESSON_PLAYER
+ Fullscreen by default on video content
+ 
+ Double-tap left: -10 seconds | Double-tap right: +10 seconds
+ 
+ Swipe up: show lesson notes panel as bottom sheet
+ 
+ Status bar hidden in fullscreen
+ 
+QUIZ_SCREEN
+ Single question per screen (not all at once)
+ 
+ Question counter and progress bar always visible at top
+ 
+ Timer anchored top-right in fixed position
+ 
+ Selected option highlights immediately (before Next tap)
+ 
+Admin Panel Screens
+SUPER_ADMIN_DASHBOARD
+ Data-dense, information hierarchy critical
+ 
+ Key metrics in top row — largest numbers on the page
+ 
+ "Students at Risk" table below the fold — red left border on rows
+ 
+---PAGE BREAK---
+KodetoCareer
+UI/UX Brief
+KodetoCareer Platform — Document 6/10 — Confidential
+Page 11
+ Charts use consistent colour palette
+ 
+BATCH_CREATE_WIZARD
+ Step indicator at top (1 of 3, 2 of 3, 3 of 3)
+ 
+ Wide form on desktop — two columns on Step 1
+ 
+ CSV preview table on Step 3 — validation errors in red inline
+ 
+CERTIFICATE_MANAGEMENT
+ Split view: eligibility table on left, certificate preview on right
+ 
+ Green check / red X in Eligible column — immediately scannable
+ 
+---
+12. Design Deliverables Required
+The design team should produce the following before development begins:
+Priority 1 (needed for MVP):
+ [ ] Design system / component library (Figma)
+ 
+ [ ] Student app — all screens in Flow 3.1 through 3.6
+ 
+ [ ] Admin panel — SUPER_ADMIN_DASHBOARD, COLLEGE_MANAGEMENT, BATCH_MANAGEMENT,
+ ATTENDANCE_MARKING, CERTIFICATE_MANAGEMENT
+ [ ] College admin portal — COLLEGE_DASHBOARD, STUDENT_LIST
+ 
+Priority 2 (can be designed during development):
+ [ ] Empty states for all screens
+ 
+ [ ] Error states and error messages
+ 
+ [ ] Loading/skeleton states
+ 
+ [ ] Responsive breakpoints for admin panel (tablet)
+ 
+ [ ] Trainer-specific views
+ 
+Design Tool: Figma
+Handoff Method: Figma Dev Mode
+Asset Export: SVG for icons, PNG 2x for illustrations
+---
+End of UI/UX Design Brief
+
+---PAGE BREAK---

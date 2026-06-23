@@ -1,0 +1,452 @@
+KodetoCareer
+TRD — Free Infrastructure Stack — v2.0 FREE STACK
+KodetoCareer — Document 03 (Updated Free Stack) — Confidential
+Page 1
+KodetoCareer — Technical Requirements
+Document (TRD)
+Version 2.0 | Updated — 100% Free Infrastructure Stack
+INFRASTRUCTURE CHANGE NOTICE
+This version replaces all paid AWS services with permanently free alternatives. The free stack is
+production-grade and sufficient for 0 to 10,000 students without incurring any infrastructure cost.
+OLD (Paid AWS) | NEW (Free Alternative) | Free Limit
+AWS EC2 | Oracle Cloud Always Free (ARM) | 4 OCPUs, 24GB RAM — permanent
+AWS RDS PostgreSQL | Neon.tech | 0.5GB DB, serverless — permanent
+AWS ElastiCache Redis | Upstash Redis | 10,000 cmd/day, 256MB — permanent
+AWS S3 + CloudFront | Cloudflare R2 + CDN | 10GB storage, zero egress — permanent
+AWS MediaConvert | Removed (direct MP4 on R2) | N/A
+AWS SES | Resend | 3,000 emails/month — permanent
+MSG91 / Twilio SMS | Email OTP only | Free
+AWS Certificate Manager | Cloudflare SSL | Free
+AWS Secrets Manager | System env vars | Free
+1. System Architecture Overview
+The KodetoCareer platform follows a modular monolith architecture deployed entirely on free-tier infrastructure
+that never expires.
+Architecture Pattern
+ Backend: Modular Monolith (Node.js / Express.js)
+ 
+ Frontend Web: React.js (Single Page Application)
+ 
+ Mobile: Flutter (iOS + Android, single codebase)
+ 
+ Database: PostgreSQL via Neon.tech (serverless, free)
+ 
+ Cache: Redis via Upstash (serverless, free)
+ 
+ Storage: Cloudflare R2 (S3-compatible, zero egress fees)
+ 
+ CDN: Cloudflare (free, global)
+ 
+ Authentication: JWT (RS256) + Refresh tokens
+ 
+ Real-time: Socket.io
+ 
+---PAGE BREAK---
+KodetoCareer
+TRD — Free Infrastructure Stack — v2.0 FREE STACK
+KodetoCareer — Document 03 (Updated Free Stack) — Confidential
+Page 2
+ Video: Direct MP4 on Cloudflare R2 (served via CDN) + YouTube/Vimeo embed support
+ 
+ Email: Resend (free tier, 3,000/month)
+ 
+2. Infrastructure Architecture
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+■                     CLIENTS                             ■
+■   Flutter App (iOS/Android)    React.js Web App         ■
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+                 ■ HTTPS (Cloudflare SSL — Free)
+■■■■■■■■■■■■■■■■■▼■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+■         Cloudflare (Free) — DNS + CDN + SSL             ■
+■         Proxies traffic to Oracle Cloud server          ■
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+                 ■
+■■■■■■■■■■■■■■■■■▼■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+■    Oracle Cloud Always Free — Ubuntu ARM VM             ■
+■    Node.js API (PM2) + React Static Build               ■
+■    4 OCPUs, 24GB RAM — always free, never expires       ■
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+       ■                                      ■
+■■■■■■■▼■■■■■■■                    ■■■■■■■■■■■▼■■■■■■■■■■
+■ Neon.tech   ■                    ■  Upstash Redis      ■
+■ Serverless  ■                    ■  Serverless         ■
+■ PostgreSQL  ■                    ■  (sessions, queues) ■
+■ Free tier   ■                    ■  Free tier          ■
+■■■■■■■■■■■■■■■                    ■■■■■■■■■■■■■■■■■■■■■■
+       ■
+■■■■■■■▼■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+■              Cloudflare R2 (Free)                       ■
+■  Videos  PDFs  Certificates  Avatars  Docs          ■
+■  10GB free storage + Zero egress cost                   ■
+■  Served via Cloudflare CDN (global, free)               ■
+■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■■
+3. Technology Stack — Detailed
+3.1 Backend (API Server)
+Component | Technology | Version | Rationale
+Runtime | Node.js | 20 LTS | Team familiarity, async I/O
+Framework | Express.js | 4.x | Minimal, flexible
+ORM | Prisma | 5.x | Works perfectly with Neon.tech PostgreSQL
+Validation | Zod | 3.x | Runtime schema validation
+Authentication | jsonwebtoken | 9.x | JWT RS256
+File Upload | Multer + @aws-sdk/client-s3 | Latest | R2 is S3-compatible, same SDK
+Email | Resend SDK | Latest | Free 3,000/month, excellent deliverability
+
+---PAGE BREAK---
+KodetoCareer
+TRD — Free Infrastructure Stack — v2.0 FREE STACK
+KodetoCareer — Document 03 (Updated Free Stack) — Confidential
+Page 3
+Queue | Bull (Upstash Redis) | Latest | Background jobs via @upstash/redis
+Logging | Winston | Latest | Structured logging to file + console
+API Docs | Swagger/OpenAPI | 3.0 | Auto-generated
+Testing | Jest + Supertest | Latest | Unit and integration tests
+Process Manager | PM2 | Latest | Production process management
+3.2 Frontend Web
+Component | Technology | Version
+Framework | React.js | 18.x
+State Management | Zustand | 4.x
+Routing | React Router | 6.x
+UI Components | shadcn/ui | Latest
+Styling | Tailwind CSS | 3.x
+Data Fetching | React Query (TanStack) | 5.x
+HTTP Client | Axios | 1.x
+Forms | React Hook Form + Zod | Latest
+Charts | Recharts | 2.x
+Rich Text | TipTap | 2.x
+Video Player | Video.js | 8.x
+Table | TanStack Table | 8.x
+Build | Vite | 5.x
+3.3 Mobile (Flutter)
+Component | Technology
+Framework | Flutter 3.x
+State Management | Riverpod 2.x
+HTTP | Dio 5.x
+Local Storage | flutter_secure_storage
+Push Notifications | firebase_messaging (FCM — free)
+Video Player | video_player + chewie
+PDF Viewer | flutter_pdfview
+Offline Support | sqflite
+Analytics | Firebase Analytics (free)
+Crash Reporting | Firebase Crashlytics (free)
+
+---PAGE BREAK---
+KodetoCareer
+TRD — Free Infrastructure Stack — v2.0 FREE STACK
+KodetoCareer — Document 03 (Updated Free Stack) — Confidential
+Page 4
+Deep Linking | go_router
+3.4 Database — Neon.tech (Free)
+Component | Details
+Provider | Neon.tech
+Engine | PostgreSQL 15
+Free Tier | 0.5GB storage, 1 compute unit, unlimited projects
+Connection | Neon serverless driver OR standard pg connection
+Pooling | Built-in Neon connection pooling (pgBouncer compatible)
+Backups | Neon automatic point-in-time recovery (7 days on free tier)
+Scale | Scales to zero when idle (no cost), instant wake
+Prisma connection string for Neon:
+DATABASE_URL="postgresql://user:pass@ep-xxx.ap-southeast-1.aws.neon.tech/kodetocareer...
+3.5 Cache — Upstash Redis (Free)
+Component | Details
+Provider | Upstash
+Free Tier | 10,000 commands/day, 256MB, 1 database
+Use Cases | Sessions, rate limiting, Bull queues, API cache
+SDK | @upstash/redis (REST-based, works without persistent connection)
+Bull Queues | Use bull with ioredis connecting to Upstash Redis
+Note: 10,000 commands/day is sufficient for ~500–1,000 active daily users. Upgrade to Upstash Pay-as-you-go
+($0.20 per 100K commands) only when you scale beyond that.
+3.6 Storage — Cloudflare R2 (Free)
+Component | Details
+Provider | Cloudflare R2
+Free Tier | 10GB storage, 1M Class A ops/month, 10M Class B ops/month
+Egress Cost | ZERO (Cloudflare charges no egress — unlike AWS S3)
+API | S3-compatible — use AWS SDK v3 with R2 endpoint
+CDN | Served via Cloudflare CDN for free (global edge)
+Custom Domain | e.g., cdn.kodetocareer.com → your R2 bucket
+R2 connection config (S3-compatible):
+import { S3Client } from '@aws-sdk/client-s3';
+export const r2Client = new S3Client({
+
+---PAGE BREAK---
+KodetoCareer
+TRD — Free Infrastructure Stack — v2.0 FREE STACK
+KodetoCareer — Document 03 (Updated Free Stack) — Confidential
+Page 5
+  region: 'auto',
+  endpoint: `https://${process.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+  credentials: {
+    accessKeyId: process.env.R2_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.R2_SECRET_ACCESS_KEY!,
+  },
+});
+// Bucket name: process.env.R2_BUCKET_NAME
+4. Video Architecture (No Transcoding — Free)
+Approach for MVP
+AWS MediaConvert (paid) is removed. Instead:
+Option A — Direct MP4 Upload (for admin-uploaded content):
+1. Admin uploads MP4 via presigned R2 URL
+ 
+2. File stored on Cloudflare R2 (up to 10GB free)
+ 
+3. Served directly from Cloudflare CDN — fast delivery globally
+ 
+4. No transcoding — one quality level (original upload quality)
+ 
+5. Video player streams MP4 directly from CDN URL
+ 
+Option B — Embed URL (YouTube/Vimeo — recommended for large videos):
+1. Trainer uploads video to YouTube (unlisted) or Vimeo
+ 
+2. Trainer pastes embed URL in admin panel
+ 
+3. Platform embeds the video in an iframe player
+ 
+4. Zero storage cost, unlimited size, CDN handled by YouTube/Vimeo
+ 
+Recommended default: YouTube Unlisted for large course videos. R2 direct upload for short demo/intro clips
+under 100MB.
+What Changes from Original TRD
+ No AWS MediaConvert job creation
+ 
+ No Lambda functions
+ 
+ No HLS transcoding pipeline
+ 
+ No adaptive bitrate (480p/720p/1080p)
+ 
+ Video player uses standard MP4 or YouTube/Vimeo iframe — both work on all devices
+ 
+Storage Structure on Cloudflare R2
+kodetocareer-bucket/
+■■■ videos/
+■   ■■■ {courseId}/{lessonId}/{filename}.mp4   (direct uploads, max 2GB)
+■■■ notes/
+■   ■■■ {courseId}/{lessonId}/{filename}.pdf
+■■■ certificates/
+■   ■■■ {year}/{studentId}/{certificateId}.pdf
+
+---PAGE BREAK---
+KodetoCareer
+TRD — Free Infrastructure Stack — v2.0 FREE STACK
+KodetoCareer — Document 03 (Updated Free Stack) — Confidential
+Page 6
+■■■ documents/
+■   ■■■ {studentId}/offers/{filename}.pdf
+■■■ avatars/
+■   ■■■ {userId}/{filename}.jpg
+■■■ thumbnails/
+    ■■■ {courseId}/{filename}.jpg
+5. API Design (Unchanged from v1)
+All API standards, endpoint patterns, response envelopes, and authentication remain identical to TRD v1. No
+changes needed here.
+6. Authentication & Security (Unchanged)
+All JWT, refresh token rotation, RBAC, and security requirements remain identical. No paid services involved.
+7. Email — Resend (Free)
+Resend Free Tier: 3,000 emails/month, 100 emails/day — permanently free.
+import { Resend } from 'resend';
+const resend = new Resend(process.env.RESEND_API_KEY);
+export const sendEmail = async ({
+  to, subject, html
+}: { to: string; subject: string; html: string }) => {
+  return resend.emails.send({
+    from: 'KodetoCareer <noreply@kodetocareer.com>',
+    to,
+    subject,
+    html,
+  });
+};
+Note on OTP delivery: SMS OTP (MSG91/Twilio) is removed. All OTPs are delivered via email only. This is free
+and sufficient for the target user base. WhatsApp OTP can be added in Version 2 via Interakt (free tier available).
+8. SMS — Removed from MVP
+SMS notifications (MSG91/Twilio) are removed from the MVP.
+Replacement: All OTP and critical alerts go via email.
+Rationale: Students have email access. Email OTP is reliable. SMS adds ■800–■2,000/month cost with no
+proportional benefit for MVP.
+Version 2 plan: Add Twilio/MSG91 SMS only when platform is generating revenue.
+
+---PAGE BREAK---
+KodetoCareer
+TRD — Free Infrastructure Stack — v2.0 FREE STACK
+KodetoCareer — Document 03 (Updated Free Stack) — Confidential
+Page 7
+9. Performance Requirements (Unchanged)
+All performance targets from TRD v1 remain identical. Oracle Cloud ARM instances (4 OCPUs, 24GB RAM)
+comfortably handle 10,000 concurrent users — more capable than t3.medium EC2.
+Caching Strategy (Updated for Upstash)
+All Redis caching logic remains identical. The only change is the connection client:
+// Use @upstash/redis for REST-based connection (works in serverless environments)
+import { Redis } from '@upstash/redis';
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+// Or use ioredis with Upstash Redis endpoint (for Bull queue compatibility)
+import Redis from 'ioredis';
+const redisClient = new Redis(process.env.UPSTASH_REDIS_URL!);
+10. Background Job Queue (Updated)
+Bull queues work with Upstash Redis via ioredis connection. All job types remain the same:
+Queue | Jobs | Change
+video-processing | Now only: update DB status on upload complete | MediaConvert removed
+certificate-generation | PDF generation, R2 upload | S3 → R2 (same SDK)
+email-notifications | Via Resend SDK | SES → Resend
+sms-notifications | REMOVED from MVP | Use email instead
+report-generation | Excel/PDF export | No change
+11. Environment Configuration (Updated)
+# App
+NODE_ENV=production
+PORT=3000
+API_VERSION=v1
+FRONTEND_URL=https://app.kodetocareer.com
+# Database — Neon.tech (FREE)
+DATABASE_URL=postgresql://user:pass@ep-xxx.neon.tech/kodetocareer?sslmode=require
+# Redis — Upstash (FREE)
+UPSTASH_REDIS_REST_URL=https://xxx.upstash.io
+UPSTASH_REDIS_REST_TOKEN=xxx
+UPSTASH_REDIS_URL=rediss://xxx:xxx@xxx.upstash.io:6380  # for ioredis/Bull
+# Auth (no change — self-generated keys, free)
+
+---PAGE BREAK---
+KodetoCareer
+TRD — Free Infrastructure Stack — v2.0 FREE STACK
+KodetoCareer — Document 03 (Updated Free Stack) — Confidential
+Page 8
+JWT_PRIVATE_KEY=<RS256 private key — generate with openssl>
+JWT_PUBLIC_KEY=<RS256 public key>
+REFRESH_TOKEN_SECRET=<64 char random>
+# Cloudflare R2 (FREE — S3-compatible)
+CF_ACCOUNT_ID=<cloudflare account id>
+R2_ACCESS_KEY_ID=<r2 access key>
+R2_SECRET_ACCESS_KEY=<r2 secret key>
+R2_BUCKET_NAME=kodetocareer-production
+R2_PUBLIC_URL=https://cdn.kodetocareer.com  # Your Cloudflare CDN custom domain
+# Email — Resend (FREE 3,000/month)
+RESEND_API_KEY=re_xxxxxxxxxxxx
+FROM_EMAIL=noreply@kodetocareer.com
+# Push Notifications — Firebase FCM (FREE)
+FCM_SERVER_KEY=<firebase server key>
+FIREBASE_PROJECT_ID=<project id>
+# Monitoring — Sentry (FREE tier)
+SENTRY_DSN=<dsn>
+# App Domain
+API_DOMAIN=api.kodetocareer.com
+Removed (all were paid):
+ AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+ 
+ SES_REGION
+ 
+ MSG91_API_KEY, MSG91_SENDER_ID
+ 
+ MEDIACONVERT_ENDPOINT, MEDIACONVERT_ROLE_ARN
+ 
+12. Deployment Architecture (Updated)
+Production Deployment — Oracle Cloud Always Free
+Oracle Cloud Free Tier (No credit card charges — permanent):
+Compute:
+■■■ VM.Standard.A1.Flex (ARM Ampere)
+■   ■■■ 4 OCPUs
+■   ■■■ 24 GB RAM
+■   ■■■ 200 GB Boot Volume (free)
+■   ■■■ Ubuntu 22.04 LTS
+■
+■■■ Services running on this VM:
+    ■■■ Node.js API (PM2, 3 instances using cluster mode)
+    ■■■ Nginx (reverse proxy, load balance PM2 instances)
+    ■■■ React build (served as static files via Nginx)
+    ■■■ Bull workers (background jobs)
+DNS + CDN + SSL:
+■■■ Cloudflare (free)
+    ■■■ DNS management
+    ■■■ SSL/TLS (full strict)
+    ■■■ CDN for static React files
+
+---PAGE BREAK---
+KodetoCareer
+TRD — Free Infrastructure Stack — v2.0 FREE STACK
+KodetoCareer — Document 03 (Updated Free Stack) — Confidential
+Page 9
+    ■■■ DDoS protection (free)
+Database: Neon.tech (external, free, serverless)
+Cache: Upstash Redis (external, free, serverless)
+Storage: Cloudflare R2 (external, free)
+Oracle Cloud Setup Steps
+1. Create Oracle Cloud account (no credit card required for Always Free)
+ 
+2. Provision VM.Standard.A1.Flex: 4 OCPU, 24GB RAM, Ubuntu 22.04
+ 
+3. Configure Security Group: open ports 80, 443, 3000
+ 
+4. Install: Node.js 20, Nginx, PM2, Git
+ 
+5. Configure Nginx as reverse proxy to Node.js port 3000
+ 
+6. Set up Cloudflare: point domain to Oracle Cloud public IP, enable proxy
+ 
+7. SSL handled automatically by Cloudflare
+ 
+PM2 Ecosystem File
+// ecosystem.config.js
+module.exports = {
+  apps: [{
+    name: 'kodetocareer-api',
+    script: 'dist/index.js',
+    instances: 3,        // Use 3 of 4 OCPUs for API
+    exec_mode: 'cluster',
+    max_memory_restart: '4G',
+    env_production: {
+      NODE_ENV: 'production',
+      PORT: 3000,
+    }
+  }]
+};
+CI/CD (GitHub Actions — Free)
+# .github/workflows/deploy.yml
+name: Deploy to Oracle Cloud
+on:
+  push:
+    branches: [main]
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: '20' }
+      - run: npm ci && npm run build && npm test
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.ORACLE_HOST }}
+          username: ubuntu
+          key: ${{ secrets.ORACLE_SSH_KEY }}
+          script: |
+
+---PAGE BREAK---
+KodetoCareer
+TRD — Free Infrastructure Stack — v2.0 FREE STACK
+KodetoCareer — Document 03 (Updated Free Stack) — Confidential
+Page 10
+            cd /app/kodetocareer-api
+            git pull origin main
+            npm ci --production
+            npm run build
+            npx prisma migrate deploy
+            pm2 reload ecosystem.config.js --env production
+13. Monitoring (Free Tools Only)
+Tool | Purpose | Free Tier
+Sentry | Application error tracking | 5,000 errors/month
+Firebase Analytics | Mobile user behaviour | Free
+Firebase Crashlytics | Crash reporting | Free
+UptimeRobot | External uptime monitoring | 50 monitors, 5-min checks
+PM2 Monit | Process monitoring on server | Free (built-in)
+Neon Dashboard | DB query performance | Free
+Cloudflare Analytics | Traffic, CDN performance | Free
+14. Disaster Recovery (Updated)
+Scenario | Recovery Approach | RTO | RPO
+Node.js process crash | PM2 auto-restarts | < 30 sec | 0
+Oracle VM restart | PM2 startup on boot | < 2 min | 0
+Database issue | Neon point-in-time restore (7 days) | < 30 min | < 5 min
+R2 storage issue | Cloudflare R2 has 99.999999999% durability | N/A | N/A
+Full VM failure | Re-provision Oracle Cloud VM, deploy from GitHub | < 1 hour | < 5 min
+End of Technical Requirements Document (Updated — Free Stack)
+All services listed are permanently free, not trial-based.
+
+---PAGE BREAK---
