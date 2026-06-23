@@ -91,3 +91,39 @@ export async function gradeSubmission(submissionId: string, data: any, graderId:
     },
   });
 }
+
+export async function getAssignments(filters: { batchId?: string; courseId?: string }) {
+  return prisma.assignment.findMany({
+    where: {
+      ...(filters.batchId && { batchId: filters.batchId }),
+      ...(filters.courseId && { courseId: filters.courseId }),
+    },
+    include: {
+      _count: {
+        select: { submissions: true },
+      },
+    },
+    orderBy: { createdAt: 'desc' },
+  });
+}
+
+export async function getSubmissions(assignmentId: string) {
+  return prisma.assignmentSubmission.findMany({
+    where: { assignmentId },
+    include: {
+      student: {
+        include: {
+          user: {
+            select: {
+              firstName: true,
+              lastName: true,
+              email: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: { submittedAt: 'desc' },
+  });
+}
+

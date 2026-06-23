@@ -47,3 +47,28 @@ export async function gradeSubmission(req: Request, res: Response, next: NextFun
     next(error);
   }
 }
+
+export async function getAssignments(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const batchId = req.query.batchId ? String(req.query.batchId) : undefined;
+    const courseId = req.query.courseId ? String(req.query.courseId) : undefined;
+    const result = await assignmentService.getAssignments({ batchId, courseId });
+    sendSuccess(res, result, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getSubmissions(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const assignmentId = req.query.assignmentId ? String(req.query.assignmentId) : '';
+    if (!assignmentId) {
+      throw new AppError('assignmentId query parameter is required', 400, 'ASSIGNMENT_ID_REQUIRED');
+    }
+    const result = await assignmentService.getSubmissions(assignmentId);
+    sendSuccess(res, result, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+

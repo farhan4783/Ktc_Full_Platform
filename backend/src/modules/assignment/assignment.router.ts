@@ -19,6 +19,18 @@ router.post(
   assignmentController.createAssignment
 );
 
+router.get(
+  '/',
+  requireRole('SUPER_ADMIN', 'COLLEGE_ADMIN', 'TRAINER', 'STUDENT'),
+  assignmentController.getAssignments
+);
+
+router.get(
+  '/submissions',
+  requireRole('SUPER_ADMIN', 'COLLEGE_ADMIN', 'TRAINER'),
+  assignmentController.getSubmissions
+);
+
 router.post(
   '/:id/submit',
   requireRole('STUDENT'),
@@ -34,5 +46,6 @@ router.post(
   validateBody(gradeSubmissionSchema),
   assignmentController.gradeSubmission
 );
+
 
 export default router;
