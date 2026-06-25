@@ -200,6 +200,48 @@ export async function submitQuizAttempt(attemptId: string, studentId: string, su
   });
 }
 
+export async function getQuizzesList(filters: { batchId?: string; studentId?: string; status?: any }) {
+  return prisma.quiz.findMany({
+    where: {
+      ...(filters.batchId && { batchId: filters.batchId }),
+      ...(filters.status && { status: filters.status }),
+    },
+    include: {
+      _count: {
+        select: { questions: true },
+      },
+      ...(filters.studentId && {
+        attempts: {
+          where: { studentId: filters.studentId },
+          orderBy: { startedAt: 'desc' },
+        },
+      }),
+    },
+  });
+}
+
+export async function getQuizById(id: string) {
+  return prisma.quiz.findUnique({
+    where: { id },
+    include: {
+      questions: {
+        orderBy: { sortOrder: 'asc' },
+        include: {
+          options: {
+            orderBy: { sortOrder: 'asc' },
+            select: {
+              id: true,
+              questionId: true,
+              optionText: true,
+              sortOrder: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
 export async function getQuizLeaderboard(quizId: string) {
   const attempts = await prisma.quizAttempt.findMany({
     where: { quizId, status: 'SUBMITTED' },

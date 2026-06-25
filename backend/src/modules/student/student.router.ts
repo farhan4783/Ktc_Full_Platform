@@ -32,6 +32,12 @@ router.patch(
 );
 
 router.post(
+  '/:id/progress',
+  requireRole('STUDENT'),
+  studentController.saveLessonProgress
+);
+
+router.post(
   '/import',
   requireRole('SUPER_ADMIN', 'COLLEGE_ADMIN'),
   auditLog('Student'),

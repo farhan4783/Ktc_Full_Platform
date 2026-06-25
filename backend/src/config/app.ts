@@ -10,11 +10,18 @@ export function createApp() {
   // Security
   app.use(helmet());
 
-  // CORS
-  const corsOrigins = process.env.CORS_ORIGINS?.split(',') || ['http://localhost:5173'];
+  const corsOrigins = process.env.CORS_ORIGINS?.split(',') || [];
   app.use(
     cors({
-      origin: corsOrigins,
+      origin: (origin, callback) => {
+        if (!origin || 
+            /^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin) || 
+            corsOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error('Not allowed by CORS'));
+        }
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
       allowedHeaders: ['Content-Type', 'Authorization'],

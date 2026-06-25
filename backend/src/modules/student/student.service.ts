@@ -335,3 +335,40 @@ export async function bulkImportStudents(collegeId: string, csvData: string) {
     errors,
   };
 }
+
+export async function saveProgress(
+  studentId: string,
+  lessonId: string,
+  videoProgressSecs: number,
+  isCompleted: boolean
+) {
+  const lesson = await prisma.lesson.findUnique({
+    where: { id: lessonId },
+  });
+
+  const durationSecs = (lesson?.durationMinutes || 0) * 60;
+  const videoCompletedPct = durationSecs > 0 ? (videoProgressSecs / durationSecs) * 100 : 100;
+
+  return prisma.studentProgress.upsert({
+    where: {
+      studentId_lessonId: {
+        studentId,
+        lessonId,
+      },
+    },
+    update: {
+      videoProgressSecs,
+      videoCompletedPct: parseFloat(videoCompletedPct.toFixed(2)),
+      isCompleted: isCompleted || videoCompletedPct >= 90,
+      completedAt: (isCompleted || videoCompletedPct >= 90) ? new Date() : null,
+    },
+    create: {
+      studentId,
+      lessonId,
+      videoProgressSecs,
+      videoCompletedPct: parseFloat(videoCompletedPct.toFixed(2)),
+      isCompleted: isCompleted || videoCompletedPct >= 90,
+      completedAt: (isCompleted || videoCompletedPct >= 90) ? new Date() : null,
+    },
+  });
+}

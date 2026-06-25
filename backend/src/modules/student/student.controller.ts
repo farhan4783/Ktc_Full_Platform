@@ -86,3 +86,20 @@ export async function importStudents(req: Request, res: Response, next: NextFunc
     next(error);
   }
 }
+
+export async function saveLessonProgress(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { id } = req.params; // student ID
+    const { lessonId, videoProgressSecs, isCompleted } = req.body;
+
+    const student = await studentService.getStudentById(id);
+    if (req.user?.role === 'STUDENT' && student.userId !== req.user.userId) {
+      throw new AppError('Access denied: Scoped student access only', 403, 'FORBIDDEN');
+    }
+
+    const progress = await studentService.saveProgress(id, lessonId, videoProgressSecs, isCompleted);
+    sendSuccess(res, progress, 200);
+  } catch (error) {
+    next(error);
+  }
+}

@@ -43,6 +43,16 @@ router.post(
 );
 
 router.get(
+  '/',
+  quizController.getQuizzes
+);
+
+router.get(
+  '/:id',
+  quizController.getQuiz
+);
+
+router.get(
   '/:id/leaderboard',
   requireRole('SUPER_ADMIN', 'COLLEGE_ADMIN', 'TRAINER', 'STUDENT'),
   quizController.getLeaderboard
