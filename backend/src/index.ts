@@ -24,6 +24,7 @@ import jobRouter from './modules/job/job.router';
 import placementRouter from './modules/placement/placement.router';
 import notificationRouter from './modules/notification/notification.router';
 import uploadRouter from './modules/upload/upload.router';
+import recruiterRouter from './modules/recruiter/recruiter.router';
 
 const app = createApp();
 const PORT = process.env.PORT || 3000;
@@ -45,6 +46,7 @@ app.use(`/api/${API_VERSION}/jobs`, jobRouter);
 app.use(`/api/${API_VERSION}/placements`, placementRouter);
 app.use(`/api/${API_VERSION}/notifications`, notificationRouter);
 app.use(`/api/${API_VERSION}/uploads`, uploadRouter);
+app.use(`/api/${API_VERSION}/recruiters`, recruiterRouter);
 
 // Apply error handling middleware (must be after routes)
 applyErrorHandler(app);

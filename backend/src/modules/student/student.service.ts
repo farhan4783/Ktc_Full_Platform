@@ -82,8 +82,18 @@ export async function getStudents(
 
   const totalPages = Math.ceil(total / take);
 
+  const itemsWithScore = await Promise.all(
+    items.map(async (item) => {
+      const score = await calculateReadinessScore(item.id);
+      return {
+        ...item,
+        readinessScore: score,
+      };
+    })
+  );
+
   return {
-    items,
+    items: itemsWithScore,
     meta: {
       page,
       limit: take,
@@ -127,6 +137,13 @@ export async function getStudentById(id: string) {
               id: true,
               name: true,
               code: true,
+              courseId: true,
+              course: {
+                select: {
+                  id: true,
+                  title: true,
+                },
+              },
             },
           },
         },
@@ -140,7 +157,11 @@ export async function getStudentById(id: string) {
     throw new AppError('Student profile not found', 404, 'STUDENT_NOT_FOUND');
   }
 
-  return student;
+  const readinessScore = await calculateReadinessScore(id);
+  return {
+    ...student,
+    readinessScore,
+  };
 }
 
 export async function updateStudent(id: string, data: UpdateStudentProfileInput) {
@@ -371,4 +392,104 @@ export async function saveProgress(
       completedAt: (isCompleted || videoCompletedPct >= 90) ? new Date() : null,
     },
   });
+}
+
+export async function calculateReadinessScore(studentId: string): Promise<number> {
+  const student = await prisma.student.findUnique({
+    where: { id: studentId },
+    select: { cgpa: true },
+  });
+  if (!student) return 0;
+
+  const activeEnrollments = await prisma.batchStudent.findMany({
+    where: { studentId, status: 'ACTIVE' },
+    include: {
+      batch: {
+        select: {
+          id: true,
+          courseId: true,
+        },
+      },
+    },
+  });
+
+  const activeBatchIds = activeEnrollments.map((e) => e.batch.id);
+  const activeCourseIds = activeEnrollments.map((e) => e.batch.courseId);
+
+  // 1. CGPA (40%)
+  const cgpaScore = student.cgpa ? (student.cgpa / 10.0) * 100 : 0;
+
+  // 2. Attendance (20%)
+  let attendancePct = 0;
+  if (activeBatchIds.length > 0) {
+    const markedSessions = await prisma.classSession.findMany({
+      where: { batchId: { in: activeBatchIds }, attendanceMarked: true },
+      select: { id: true },
+    });
+    if (markedSessions.length > 0) {
+      const sessionIds = markedSessions.map((s) => s.id);
+      const attendanceRecords = await prisma.attendanceRecord.findMany({
+        where: { studentId, sessionId: { in: sessionIds } },
+        select: { status: true },
+      });
+      const presentCount = attendanceRecords.filter(
+        (r) => r.status === 'PRESENT' || r.status === 'LATE'
+      ).length;
+      attendancePct = (presentCount / markedSessions.length) * 100;
+    }
+  }
+
+  // 3. Quiz Avg (20%)
+  let quizAvgPct = 0;
+  if (activeBatchIds.length > 0 && activeCourseIds.length > 0) {
+    const quizzes = await prisma.quiz.findMany({
+      where: {
+        batchId: { in: activeBatchIds },
+        courseId: { in: activeCourseIds },
+        status: 'PUBLISHED',
+      },
+      select: { id: true },
+    });
+    if (quizzes.length > 0) {
+      let totalPct = 0;
+      for (const quiz of quizzes) {
+        const highestAttempt = await prisma.quizAttempt.findFirst({
+          where: { quizId: quiz.id, studentId, status: 'SUBMITTED' },
+          orderBy: { percentage: 'desc' },
+          select: { percentage: true },
+        });
+        totalPct += highestAttempt?.percentage || 0;
+      }
+      quizAvgPct = totalPct / quizzes.length;
+    }
+  }
+
+  // 4. Course Progress (20%)
+  let progressPct = 0;
+  if (activeCourseIds.length > 0) {
+    const totalLessons = await prisma.lesson.count({
+      where: {
+        module: {
+          courseId: { in: activeCourseIds },
+        },
+      },
+    });
+    if (totalLessons > 0) {
+      const completedLessons = await prisma.studentProgress.count({
+        where: {
+          studentId,
+          isCompleted: true,
+          lesson: {
+            module: {
+              courseId: { in: activeCourseIds },
+            },
+          },
+        },
+      });
+      progressPct = (completedLessons / totalLessons) * 100;
+    }
+  }
+
+  const score = (cgpaScore * 0.4) + (attendancePct * 0.2) + (quizAvgPct * 0.2) + (progressPct * 0.2);
+  return parseFloat(score.toFixed(2));
 }

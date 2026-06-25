@@ -62,6 +62,12 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
           { name: 'Attendance', path: '/attendance', icon: Layers },
           { name: 'Grading', path: '/grading', icon: FileCheck },
         ];
+      case 'RECRUITER':
+        return [
+          { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
+          { name: 'Search Candidates', path: '/recruiter/search', icon: Users },
+          { name: 'Job Opportunities', path: '/jobs', icon: Briefcase },
+        ];
       default:
         return [];
     }

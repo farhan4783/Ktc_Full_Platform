@@ -5,7 +5,7 @@ interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: 'SUPER_ADMIN' | 'COLLEGE_ADMIN' | 'TRAINER' | 'STUDENT';
+  role: 'SUPER_ADMIN' | 'COLLEGE_ADMIN' | 'TRAINER' | 'STUDENT' | 'RECRUITER';
   avatarUrl?: string | null;
   collegeId?: string | null;
 }

@@ -23,6 +23,7 @@ enum UserRole {
   COLLEGE_ADMIN
   TRAINER
   STUDENT
+  RECRUITER
 }
 
 enum VerificationType {
@@ -232,6 +233,7 @@ model User {
   refreshTokens         RefreshToken[]
   student               Student?
   trainer               Trainer?
+  recruiter             Recruiter?
   collegeAdmins         CollegeAdmin[]
   createdColleges       College[]              @relation("CollegeCreator")
   createdBatches        Batch[]                @relation("BatchCreator")
@@ -1183,4 +1185,23 @@ model SystemSetting {
   updatedAt   DateTime @updatedAt @map("updated_at")
 
   @@map("system_settings")
+}
+
+// ============================================================
+// RECRUITERS
+// ============================================================
+
+model Recruiter {
+  id          String   @id @default(uuid())
+  userId      String   @unique @map("user_id")
+  companyName String   @map("company_name")
+  designation String?
+  website     String?
+  isApproved  Boolean  @default(false) @map("is_approved")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("recruiters")
 }

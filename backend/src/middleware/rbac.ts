@@ -42,6 +42,7 @@ const ROLE_HIERARCHY: Record<UserRole, number> = {
   COLLEGE_ADMIN: 3,
   TRAINER: 2,
   STUDENT: 1,
+  RECRUITER: 1,
 };
 
 export function requireMinRole(minRole: UserRole) {

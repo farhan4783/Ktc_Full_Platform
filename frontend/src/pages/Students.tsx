@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
 import apiClient from '../config/axios';
-import { Search, Upload, X, AlertCircle } from 'lucide-react';
+import { Search, Upload, X, AlertCircle, Award, Check, ExternalLink, Loader } from 'lucide-react';
 
 interface Student {
   id: string;
@@ -49,6 +49,71 @@ export const Students: React.FC = () => {
   } | null>(null);
   const [importing, setImporting] = useState(false);
   const [importError, setImportError] = useState<string | null>(null);
+
+  // Certificates Dialog States
+  const [isCertificatesOpen, setIsCertificatesOpen] = useState(false);
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [studentDetails, setStudentDetails] = useState<any | null>(null);
+  const [loadingDetails, setLoadingDetails] = useState(false);
+  const [eligibilityData, setEligibilityData] = useState<Record<string, any>>({});
+  const [checkingEligibility, setCheckingEligibility] = useState<Record<string, boolean>>({});
+  const [generatingCert, setGeneratingCert] = useState<Record<string, boolean>>({});
+
+  const handleOpenCertificates = async (student: Student) => {
+    setSelectedStudent(student);
+    setIsCertificatesOpen(true);
+    setStudentDetails(null);
+    setEligibilityData({});
+    setCheckingEligibility({});
+    setGeneratingCert({});
+    setLoadingDetails(true);
+
+    try {
+      const res = await apiClient.get(`/students/${student.id}`);
+      setStudentDetails(res.data.data);
+      
+      const batches = res.data.data.batchStudents || [];
+      for (const bs of batches) {
+        const batch = bs.batch;
+        if (batch && batch.courseId) {
+          checkCourseEligibility(student.id, batch.courseId, batch.id);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to load student details', err);
+    } finally {
+      setLoadingDetails(false);
+    }
+  };
+
+  const checkCourseEligibility = async (studentId: string, courseId: string, batchId: string) => {
+    setCheckingEligibility((prev) => ({ ...prev, [courseId]: true }));
+    try {
+      const res = await apiClient.get('/certificate/eligibility', {
+        params: { studentId, courseId, batchId },
+      });
+      setEligibilityData((prev) => ({ ...prev, [courseId]: res.data.data }));
+    } catch (err) {
+      console.error('Failed to check eligibility', err);
+    } finally {
+      setCheckingEligibility((prev) => ({ ...prev, [courseId]: false }));
+    }
+  };
+
+  const handleGenerateCertificate = async (studentId: string, courseId: string, batchId: string) => {
+    setGeneratingCert((prev) => ({ ...prev, [courseId]: true }));
+    try {
+      await apiClient.post('/certificate', { studentId, courseId, batchId });
+      if (selectedStudent) {
+        handleOpenCertificates(selectedStudent);
+      }
+    } catch (err) {
+      console.error('Failed to generate certificate', err);
+      alert('Failed to generate certificate. Please make sure the student meets all eligibility criteria.');
+    } finally {
+      setGeneratingCert((prev) => ({ ...prev, [courseId]: false }));
+    }
+  };
 
   const fetchStudents = async () => {
     try {
@@ -205,18 +270,19 @@ export const Students: React.FC = () => {
                 <th className="px-6 py-4">Grad Year</th>
                 {isSuperAdmin && <th className="px-6 py-4">College</th>}
                 <th className="px-6 py-4 text-center">Placement</th>
+                <th className="px-6 py-4 text-center">Certificates</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/5">
               {loading ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-10">
+                  <td colSpan={8} className="text-center py-10">
                     <div className="w-8 h-8 border-2 border-brand/20 border-t-brand rounded-full animate-spin mx-auto"></div>
                   </td>
                 </tr>
               ) : students.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="text-center py-10 text-slate-500">
+                  <td colSpan={8} className="text-center py-10 text-slate-500">
                     No students found.
                   </td>
                 </tr>
@@ -245,6 +311,14 @@ export const Students: React.FC = () => {
                       }`}>
                         {student.placementStatus}
                       </span>
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => handleOpenCertificates(student)}
+                        className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-brand/10 text-slate-300 hover:text-brand text-xs font-semibold tracking-wide transition-all duration-150"
+                      >
+                        Manage
+                      </button>
                     </td>
                   </tr>
                 ))
@@ -402,6 +476,163 @@ export const Students: React.FC = () => {
                 >
                   CLOSE DIALOG
                 </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Certificates Modal */}
+      {isCertificatesOpen && selectedStudent && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+          <div className="w-full max-w-2xl p-6 glow-card rounded-2xl border border-white/5 bg-slate-950/95 relative animate-in zoom-in-95 duration-150 max-h-[85vh] overflow-y-auto">
+            <button
+              onClick={() => setIsCertificatesOpen(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2.5 rounded-xl bg-brand/10 text-brand">
+                <Award className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white">Student Certifications</h3>
+                <p className="text-xs text-slate-400">
+                  Manage and issue completion certificates for {selectedStudent.user.firstName} {selectedStudent.user.lastName} ({selectedStudent.studentCode})
+                </p>
+              </div>
+            </div>
+
+            {loadingDetails ? (
+              <div className="flex flex-col items-center py-12 space-y-3">
+                <Loader className="w-8 h-8 text-brand animate-spin" />
+                <span className="text-xs text-slate-500 font-semibold uppercase tracking-wider">Loading student enrollment...</span>
+              </div>
+            ) : !studentDetails || !studentDetails.batchStudents || studentDetails.batchStudents.length === 0 ? (
+              <div className="p-8 text-center text-slate-500 text-sm">
+                This student is not enrolled in any active course batches.
+              </div>
+            ) : (
+              <div className="space-y-6">
+                {studentDetails.batchStudents.map((bs: any) => {
+                  const batch = bs.batch;
+                  if (!batch || !batch.course) return null;
+                  const course = batch.course;
+                  const eligibility = eligibilityData[course.id];
+                  const checking = checkingEligibility[course.id];
+                  const generating = generatingCert[course.id];
+
+                  // Check if student already has a certificate issued for this course
+                  const existingCert = studentDetails.certificates?.find(
+                    (c: any) => c.courseId === course.id && c.isValid
+                  );
+
+                  return (
+                    <div
+                      key={course.id}
+                      className="p-5 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all space-y-4"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                        <div>
+                          <h4 className="font-bold text-white text-base leading-snug">{course.title}</h4>
+                          <span className="text-xs text-slate-500">
+                            Batch: <span className="text-slate-400 font-semibold">{batch.name}</span> ({batch.code})
+                          </span>
+                        </div>
+
+                        <div>
+                          {existingCert ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-950/30 text-emerald-400 border border-emerald-500/20">
+                              <Check className="w-3 h-3 inline mr-1" /> ISSUED
+                            </span>
+                          ) : checking ? (
+                            <span className="text-xs text-slate-500 font-medium">Checking eligibility...</span>
+                          ) : eligibility?.isEligible ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#00D2FF]/10 text-[#00D2FF] border border-[#00D2FF]/20">
+                              ELIGIBLE
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-950/30 text-red-400 border border-red-500/20">
+                              INELIGIBLE
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Eligibility details when not generated */}
+                      {!existingCert && eligibility && !checking && (
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 pb-1 text-xs border-t border-white/5">
+                          {/* Attendance metric */}
+                          <div className="space-y-1">
+                            <span className="text-slate-500 uppercase font-bold tracking-wider text-[9px]">Attendance Rate</span>
+                            <div className="flex items-center gap-2">
+                              <span className={`font-bold ${eligibility.details.isAttendanceEligible ? 'text-white' : 'text-red-400'}`}>
+                                {eligibility.attendancePct}%
+                              </span>
+                              <span className="text-slate-600">/ Req {eligibility.minAttendanceRequired}%</span>
+                            </div>
+                          </div>
+
+                          {/* Quiz Average metric */}
+                          <div className="space-y-1">
+                            <span className="text-slate-500 uppercase font-bold tracking-wider text-[9px]">Quiz Average</span>
+                            <div className="flex items-center gap-2">
+                              <span className={`font-bold ${eligibility.details.isQuizEligible ? 'text-white' : 'text-red-400'}`}>
+                                {eligibility.quizAvgPct}%
+                              </span>
+                              <span className="text-slate-600">/ Req {eligibility.minQuizAvgRequired}%</span>
+                            </div>
+                          </div>
+
+                          {/* Assignment completion metric */}
+                          <div className="space-y-1">
+                            <span className="text-slate-500 uppercase font-bold tracking-wider text-[9px]">Mandatory Assignments</span>
+                            <div className="flex items-center gap-2">
+                              <span className={`font-bold ${eligibility.details.isAssignmentsEligible ? 'text-white' : 'text-red-400'}`}>
+                                {eligibility.gradedAssignmentsCount} / {eligibility.totalAssignmentsCount}
+                              </span>
+                              <span className="text-slate-600">graded</span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Action buttons */}
+                      <div className="flex items-center justify-end gap-3 pt-1">
+                        {existingCert ? (
+                          <>
+                            <a
+                              href={`/verify/${existingCert.certificateCode}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-white font-bold text-xs tracking-wide transition-all duration-150 flex items-center gap-1.5"
+                            >
+                              Verify <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                            <a
+                              href={existingCert.pdfUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-dark to-brand-electric text-white font-bold text-xs tracking-wide shadow-[0_0_10px_rgba(0,210,255,0.15)] hover:shadow-[0_0_20px_rgba(0,210,255,0.25)] transition-all duration-150 flex items-center gap-1.5"
+                            >
+                              Download PDF <ExternalLink className="w-3.5 h-3.5" />
+                            </a>
+                          </>
+                        ) : (
+                          <button
+                            disabled={!eligibility?.isEligible || generating || checking}
+                            onClick={() => handleGenerateCertificate(selectedStudent.id, course.id, batch.id)}
+                            className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-brand-dark to-brand-electric disabled:from-slate-800 disabled:to-slate-800 text-white disabled:text-slate-500 font-bold text-xs tracking-wide shadow-[0_0_10px_rgba(0,210,255,0.15)] disabled:shadow-none transition-all duration-150"
+                          >
+                            {generating ? 'GENERATING CERTIFICATE...' : 'ISSUE OFFICIAL CERTIFICATE'}
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

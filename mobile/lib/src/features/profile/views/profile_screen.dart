@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/api/api_client.dart';
 
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
@@ -140,6 +142,107 @@ class ProfileScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
 
+            // Certificates Card
+            if (student != null) ...[
+              FutureBuilder<List<dynamic>>(
+                future: _fetchCertificates(ref, student.id),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Card(
+                      child: Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                    );
+                  }
+                  
+                  final certs = snapshot.data ?? [];
+                  if (certs.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+
+                  return Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(20.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Row(
+                            children: [
+                              Icon(LucideIcons.award, color: AppTheme.primary, size: 20),
+                              SizedBox(width: 8),
+                              Text(
+                                'Verified Certifications',
+                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                              ),
+                            ],
+                          ),
+                          const Divider(color: AppTheme.border, height: 24),
+                          ListView.separated(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: certs.length,
+                            separatorBuilder: (context, index) => const Divider(color: AppTheme.border, height: 16),
+                            itemBuilder: (context, index) {
+                              final cert = certs[index];
+                              final courseTitle = cert['course']?['title'] ?? 'Course';
+                              final certCode = cert['certificateCode'] ?? '';
+                              final pdfUrl = cert['pdfUrl'] ?? '';
+                              final issuedAtStr = cert['issuedAt'] ?? '';
+                              
+                              String dateStr = '';
+                              if (issuedAtStr.isNotEmpty) {
+                                try {
+                                  final date = DateTime.parse(issuedAtStr);
+                                  dateStr = '${date.day}/${date.month}/${date.year}';
+                                } catch (_) {}
+                              }
+
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          courseTitle,
+                                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.white),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'ID: $certCode • Issued: $dateStr',
+                                          style: TextStyle(fontSize: 10, color: AppTheme.textSecondary),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: const Icon(LucideIcons.externalLink, color: AppTheme.primary, size: 18),
+                                    onPressed: () async {
+                                      if (pdfUrl.isNotEmpty) {
+                                        final uri = Uri.parse(pdfUrl);
+                                        if (await canLaunchUrl(uri)) {
+                                          await launchUrl(uri, mode: LaunchMode.externalApplication);
+                                        }
+                                      }
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 16),
+            ],
+
             // Skills Card
             Card(
               child: Padding(
@@ -258,5 +361,16 @@ class ProfileScreen extends ConsumerWidget {
         ),
       ],
     );
+  }
+
+  Future<List<dynamic>> _fetchCertificates(WidgetRef ref, String studentId) async {
+    try {
+      final dio = ref.read(dioProvider);
+      final response = await dio.get('/certificate/student/$studentId');
+      return response.data['data'] as List<dynamic>;
+    } catch (e) {
+      debugPrint('Error fetching certificates: $e');
+      return [];
+    }
   }
 }

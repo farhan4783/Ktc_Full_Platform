@@ -21,6 +21,7 @@ import {
   Briefcase,
   GraduationCap
 } from 'lucide-react';
+import RecruiterDashboard from './RecruiterDashboard';
 
 interface DashboardStats {
   totalColleges: number;
@@ -33,6 +34,11 @@ interface DashboardStats {
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuthStore();
+
+  if (user?.role === 'RECRUITER') {
+    return <RecruiterDashboard />;
+  }
+
   const [stats, setStats] = useState<DashboardStats>({
     totalColleges: 0,
     totalStudents: 0,

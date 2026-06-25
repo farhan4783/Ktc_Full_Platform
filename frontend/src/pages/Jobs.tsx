@@ -16,13 +16,21 @@ interface JobOpportunity {
   applicationDeadline: string | null;
   isActive: boolean;
   createdAt: string;
+  postedBy?: string | null;
 }
 
 export const Jobs: React.FC = () => {
   const { user } = useAuthStore();
   const isSuperAdmin = user?.role === 'SUPER_ADMIN';
   const isCollegeAdmin = user?.role === 'COLLEGE_ADMIN';
-  const canModifyJobs = isSuperAdmin || isCollegeAdmin;
+  const isRecruiter = user?.role === 'RECRUITER';
+  const canModifyJobs = isSuperAdmin || isCollegeAdmin || isRecruiter;
+
+  const canEditJob = (job: JobOpportunity) => {
+    if (isSuperAdmin || isCollegeAdmin) return true;
+    if (isRecruiter && job.postedBy === user?.id) return true;
+    return false;
+  };
 
   const [jobs, setJobs] = useState<JobOpportunity[]>([]);
   const [loading, setLoading] = useState(true);
@@ -194,7 +202,7 @@ export const Jobs: React.FC = () => {
                     </div>
                   </div>
 
-                  {canModifyJobs && (
+                  {canEditJob(job) && (
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleOpenEdit(job)}

@@ -18,6 +18,8 @@ import ReportsAttendance from './pages/ReportsAttendance';
 import ReportsProgress from './pages/ReportsProgress';
 import Attendance from './pages/Attendance';
 import Grading from './pages/Grading';
+import VerifyCertificate from './pages/VerifyCertificate';
+import RecruiterDashboard from './pages/RecruiterDashboard';
 
 
 const queryClient = new QueryClient();
@@ -34,6 +36,7 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/login" element={<Login />} />
+          <Route path="/verify/:code" element={<VerifyCertificate />} />
           
           {/* Protected Routes inside DashboardLayout */}
           <Route
@@ -56,6 +59,7 @@ export default function App() {
                     {/* CRM & Placement Scoped */}
                     <Route path="placements" element={<Placements />} />
                     <Route path="jobs" element={<Jobs />} />
+                    <Route path="recruiter/search" element={<RecruiterDashboard />} />
                     <Route path="communication" element={<Communication />} />
                     
                     {/* Reports Scoped */}

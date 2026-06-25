@@ -600,6 +600,10 @@ export async function getCurrentUser(userId: string) {
           skills: true,
           placementStatus: true,
           profileCompleted: true,
+          cgpa: true,
+          resumeUrl: true,
+          linkedinUrl: true,
+          githubUrl: true,
         },
       },
       trainer: {

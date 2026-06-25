@@ -82,10 +82,36 @@ export async function validateEligibility(studentId: string, courseId: string, b
     quizAvgPct = totalPct / quizzes.length;
   }
 
-  // 4. Check eligibility thresholds
+  // 4. Calculate Assignment Completion / Grading
+  const assignments = await prisma.assignment.findMany({
+    where: {
+      batchId,
+      courseId,
+      status: 'PUBLISHED',
+    },
+    select: { id: true },
+  });
+
+  let isAssignmentsEligible = true;
+  let gradedAssignmentsCount = 0;
+  if (assignments.length > 0) {
+    const assignmentIds = assignments.map((a) => a.id);
+    const submissions = await prisma.assignmentSubmission.findMany({
+      where: {
+        studentId,
+        assignmentId: { in: assignmentIds },
+        status: 'GRADED',
+      },
+      select: { id: true },
+    });
+    gradedAssignmentsCount = submissions.length;
+    isAssignmentsEligible = submissions.length === assignments.length;
+  }
+
+  // 5. Check eligibility thresholds
   const isAttendanceEligible = attendancePct >= course.minAttendancePct;
   const isQuizEligible = quizAvgPct >= course.minQuizAvgPct;
-  const isEligible = isAttendanceEligible && isQuizEligible;
+  const isEligible = isAttendanceEligible && isQuizEligible && isAssignmentsEligible;
 
   return {
     isEligible,
@@ -93,9 +119,12 @@ export async function validateEligibility(studentId: string, courseId: string, b
     minAttendanceRequired: course.minAttendancePct,
     quizAvgPct: parseFloat(quizAvgPct.toFixed(2)),
     minQuizAvgRequired: course.minQuizAvgPct,
+    gradedAssignmentsCount,
+    totalAssignmentsCount: assignments.length,
     details: {
       isAttendanceEligible,
       isQuizEligible,
+      isAssignmentsEligible,
     },
   };
 }
