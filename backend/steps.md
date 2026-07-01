@@ -87,3 +87,16 @@ npm run dev
 ```
 
 You can now test the API health status by opening `http://localhost:3000/health` in your browser.
+
+
+
+
+password for everylogin
+
+
+Role / Actor	Email Address	Default Password
+👑 Super Admin	-            superadmin@kodetocareer.com	      Password123!
+🏛️ College Admin (Admin) - 	collegeadmin@kodetocareer.com	     Password123!
+🧑‍🏫 Trainer  -              	trainer@kodetocareer.com	         Password123!
+🎓 Student-                	student@kodetocareer.com	          Password123!
+

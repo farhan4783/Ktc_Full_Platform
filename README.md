@@ -153,10 +153,3 @@ npm install
 # Start Vite local development server on port 5173
 npm run dev
 ```
-
-### 🔐 Seeded Login Credentials
-Use the password **`Password123!`** to test the web portal components:
-*   👑 **Super Admin**: `superadmin@kodetocareer.com`
-*   🏛️ **College Admin**: `collegeadmin@kodetocareer.com`
-*   🧑‍🏫 **Trainer**: `trainer@kodetocareer.com`
-*   🎓 **Student**: `student@kodetocareer.com`
