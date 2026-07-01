@@ -60,7 +60,7 @@ class CourseNotifier extends StateNotifier<CourseState> {
 
       String errMsg = 'Failed to fetch batches';
       if (e is DioException) {
-        errMsg = e.response?.data?['message'] ?? e.message ?? errMsg;
+        errMsg = e.response?.data?['error']?['message'] ?? e.response?.data?['message'] ?? e.message ?? errMsg;
       }
       state = state.copyWith(isLoading: false, errorMessage: errMsg);
     }
@@ -91,7 +91,7 @@ class CourseNotifier extends StateNotifier<CourseState> {
 
       String errMsg = 'Failed to fetch course details';
       if (e is DioException) {
-        errMsg = e.response?.data?['message'] ?? e.message ?? errMsg;
+        errMsg = e.response?.data?['error']?['message'] ?? e.response?.data?['message'] ?? e.message ?? errMsg;
       }
       state = state.copyWith(isLoading: false, errorMessage: errMsg);
     }

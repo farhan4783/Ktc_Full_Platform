@@ -18,11 +18,21 @@ interface EmailOptions {
  */
 async function sendEmail(options: EmailOptions): Promise<boolean> {
   try {
-    // In development, just log
-    if (process.env.NODE_ENV === 'development' && !process.env.RESEND_API_KEY) {
-      logger.info(`[EMAIL] To: ${options.to} | Subject: ${options.subject}`);
-      logger.debug(`[EMAIL] Body: ${options.html.substring(0, 200)}...`);
-      return true;
+    // In development, always log email details and print the OTP clearly
+    if (process.env.NODE_ENV === 'development') {
+      logger.info(`[EMAIL DEVELOPMENT] To: ${options.to} | Subject: ${options.subject}`);
+      const otpMatch = options.html.match(/>(\d{6})</);
+      if (otpMatch) {
+        logger.info(`[EMAIL DEVELOPMENT] FOUND OTP CODE: ${otpMatch[1]}`);
+      }
+      logger.info(`[EMAIL DEVELOPMENT] Body: ${options.html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').substring(0, 300).trim()}...`);
+
+      const hasNoKey = !process.env.RESEND_API_KEY;
+      const isDummyKey = process.env.RESEND_API_KEY?.startsWith('re_xxx') || process.env.RESEND_API_KEY === 'your_resend_api_key_here';
+      if (hasNoKey || isDummyKey) {
+        logger.info('[EMAIL DEVELOPMENT] Bypassing Resend API (dummy or missing key)');
+        return true;
+      }
     }
 
     const { error } = await resend.emails.send({

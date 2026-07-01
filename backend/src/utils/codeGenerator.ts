@@ -62,6 +62,9 @@ export function generateBatchCode(collegeCode: string): string {
  * Generate 6-digit OTP
  */
 export function generateOtp(): string {
+  if (process.env.NODE_ENV === 'development') {
+    return '123456';
+  }
   return Math.floor(100000 + Math.random() * 900000).toString();
 }
 

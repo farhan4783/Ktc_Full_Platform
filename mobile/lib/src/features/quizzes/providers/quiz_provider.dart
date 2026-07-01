@@ -67,7 +67,7 @@ class QuizNotifier extends StateNotifier<QuizState> {
 
       String errMsg = 'Failed to fetch quizzes';
       if (e is DioException) {
-        errMsg = e.response?.data?['message'] ?? e.message ?? errMsg;
+        errMsg = e.response?.data?['error']?['message'] ?? e.response?.data?['message'] ?? e.message ?? errMsg;
       }
       state = state.copyWith(isLoading: false, errorMessage: errMsg);
     }
@@ -120,7 +120,7 @@ class QuizNotifier extends StateNotifier<QuizState> {
 
       String errMsg = 'Failed to start quiz attempt';
       if (e is DioException) {
-        errMsg = e.response?.data?['message'] ?? e.message ?? errMsg;
+        errMsg = e.response?.data?['error']?['message'] ?? e.response?.data?['message'] ?? e.message ?? errMsg;
       }
       state = state.copyWith(isLoading: false, errorMessage: errMsg);
       return false;
@@ -192,7 +192,7 @@ class QuizNotifier extends StateNotifier<QuizState> {
 
       String errMsg = 'Failed to submit quiz';
       if (e is DioException) {
-        errMsg = e.response?.data?['message'] ?? e.message ?? errMsg;
+        errMsg = e.response?.data?['error']?['message'] ?? e.response?.data?['message'] ?? e.message ?? errMsg;
       }
       state = state.copyWith(isLoading: false, errorMessage: errMsg);
       return null;
@@ -209,7 +209,7 @@ class QuizNotifier extends StateNotifier<QuizState> {
     } catch (e) {
       String errMsg = 'Failed to fetch leaderboard';
       if (e is DioException) {
-        errMsg = e.response?.data?['message'] ?? e.message ?? errMsg;
+        errMsg = e.response?.data?['error']?['message'] ?? e.response?.data?['message'] ?? e.message ?? errMsg;
       }
       state = state.copyWith(isLoading: false, errorMessage: errMsg);
     }

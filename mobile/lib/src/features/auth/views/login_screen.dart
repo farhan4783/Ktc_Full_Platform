@@ -18,6 +18,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _obscurePassword = true;
 
   @override
+  void initState() {
+    super.initState();
+    _emailController.text = 'student@kodetocareer.com';
+    _passwordController.text = 'Password123!';
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();

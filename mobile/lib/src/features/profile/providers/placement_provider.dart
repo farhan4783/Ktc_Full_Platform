@@ -54,7 +54,7 @@ class PlacementNotifier extends StateNotifier<PlacementState> {
     } catch (e) {
       String errMsg = 'Failed to load jobs';
       if (e is DioException) {
-        errMsg = e.response?.data?['message'] ?? e.message ?? errMsg;
+        errMsg = e.response?.data?['error']?['message'] ?? e.response?.data?['message'] ?? e.message ?? errMsg;
       }
       state = state.copyWith(isLoading: false, errorMessage: errMsg);
     }

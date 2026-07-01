@@ -124,14 +124,32 @@ export async function register(data: RegisterInput) {
       },
     });
 
-    // Create the student profile
+    // Create the student profile and automatically associate with default college/batch for testing if present
     const studentCode = generateStudentCode();
-    await tx.student.create({
+    const firstCollege = await tx.college.findFirst();
+
+    const student = await tx.student.create({
       data: {
         userId: newUser.id,
         studentCode,
+        ...(firstCollege && { collegeId: firstCollege.id }),
       },
     });
+
+    if (firstCollege) {
+      const firstBatch = await tx.batch.findFirst({
+        where: { collegeId: firstCollege.id },
+      });
+      if (firstBatch) {
+        await tx.batchStudent.create({
+          data: {
+            batchId: firstBatch.id,
+            studentId: student.id,
+            status: 'ACTIVE',
+          },
+        });
+      }
+    }
 
     return newUser;
   });

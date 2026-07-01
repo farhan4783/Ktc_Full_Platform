@@ -91,6 +91,16 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final userData = meResponse.data['data'];
       final user = UserModel.fromJson(userData);
 
+      if (user.role != 'STUDENT') {
+        await storage.delete(key: 'accessToken');
+        await storage.delete(key: 'refreshToken');
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: 'Only students are permitted to access this mobile app.',
+        );
+        return false;
+      }
+
       state = state.copyWith(
         isLoading: false,
         user: user,
@@ -99,7 +109,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       String errMsg = 'Login failed';
       if (e is DioException) {
-        errMsg = e.response?.data?['message'] ?? e.message ?? errMsg;
+        errMsg = e.response?.data?['error']?['message'] ?? e.response?.data?['message'] ?? e.message ?? errMsg;
       }
       state = state.copyWith(isLoading: false, errorMessage: errMsg);
       return false;
@@ -122,7 +132,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       String errMsg = 'Registration failed';
       if (e is DioException) {
-        errMsg = e.response?.data?['message'] ?? e.message ?? errMsg;
+        errMsg = e.response?.data?['error']?['message'] ?? e.response?.data?['message'] ?? e.message ?? errMsg;
       }
       state = state.copyWith(isLoading: false, errorMessage: errMsg);
       return false;
@@ -143,7 +153,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       String errMsg = 'Verification failed';
       if (e is DioException) {
-        errMsg = e.response?.data?['message'] ?? e.message ?? errMsg;
+        errMsg = e.response?.data?['error']?['message'] ?? e.response?.data?['message'] ?? e.message ?? errMsg;
       }
       state = state.copyWith(isLoading: false, errorMessage: errMsg);
       return false;
@@ -195,7 +205,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     } catch (e) {
       String errMsg = 'Profile update failed';
       if (e is DioException) {
-        errMsg = e.response?.data?['message'] ?? e.message ?? errMsg;
+        errMsg = e.response?.data?['error']?['message'] ?? e.response?.data?['message'] ?? e.message ?? errMsg;
       }
       state = state.copyWith(isLoading: false, errorMessage: errMsg);
       return false;
