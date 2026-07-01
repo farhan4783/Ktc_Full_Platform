@@ -1,0 +1,70 @@
+- generic [ref=e2]:
+  - status [ref=e153]: Receipt generated successfully!
+  - generic [ref=e5]:
+    - complementary [ref=e6]:
+      - link "KodeToCareer Logo" [ref=e8] [cursor=pointer]:
+        - /url: /
+        - img "KodeToCareer Logo" [ref=e9]
+      - navigation [ref=e10]:
+        - link "Dashboard" [ref=e11] [cursor=pointer]:
+          - /url: /
+          - img [ref=e12]
+          - text: Dashboard
+        - link "Students" [ref=e17] [cursor=pointer]:
+          - /url: /students
+          - img [ref=e18]
+          - text: Students
+        - link "Payments" [ref=e23] [cursor=pointer]:
+          - /url: /payments
+          - img [ref=e24]
+          - text: Payments
+        - link "Receipts" [ref=e26] [cursor=pointer]:
+          - /url: /receipts
+          - img [ref=e27]
+          - text: Receipts
+        - link "Certificates" [ref=e30] [cursor=pointer]:
+          - /url: /certificates
+          - img [ref=e31]
+          - text: Certificates
+        - link "Internship Letters" [ref=e34] [cursor=pointer]:
+          - /url: /internship-letters
+          - img [ref=e35]
+          - text: Internship Letters
+        - link "Reports" [ref=e38] [cursor=pointer]:
+          - /url: /reports
+          - img [ref=e39]
+          - text: Reports
+        - link "User Management" [ref=e42] [cursor=pointer]:
+          - /url: /admin/users
+          - img [ref=e43]
+          - text: User Management
+      - button "Logout" [ref=e47] [cursor=pointer]:
+        - img [ref=e48]
+        - text: Logout
+    - generic [ref=e51]:
+      - banner [ref=e52]:
+        - generic [ref=e54]:
+          - heading "Receipt Generator" [level=2] [ref=e55]
+          - paragraph [ref=e56]: Welcome back, Super Admin! 👋
+        - generic [ref=e57]:
+          - generic [ref=e58]:
+            - img [ref=e59]
+            - textbox "Search..." [ref=e62]
+          - generic [ref=e63]:
+            - button [ref=e64] [cursor=pointer]:
+              - img [ref=e65]
+            - generic [ref=e68]:
+              - generic [ref=e69]: S
+              - generic [ref=e70]:
+                - paragraph [ref=e71]: Super Admin
+                - paragraph [ref=e72]: admin
+      - main [ref=e73]:
+        - generic [ref=e75]:
+          - generic [ref=e154]:
+            - button "Create New Receipt" [ref=e155] [cursor=pointer]:
+              - img [ref=e156]
+              - text: Create New Receipt
+            - generic [ref=e158]:
+              - img [ref=e159]
+              - text: Receipt Saved to Database
+          - img [ref=e163]

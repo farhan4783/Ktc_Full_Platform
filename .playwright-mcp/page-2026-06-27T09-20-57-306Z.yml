@@ -1,0 +1,216 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e38]:
+    - complementary [ref=e39]:
+      - link "KodeToCareer Logo" [ref=e41] [cursor=pointer]:
+        - /url: /
+        - img "KodeToCareer Logo" [ref=e42]
+      - navigation [ref=e43]:
+        - link "Dashboard" [ref=e44] [cursor=pointer]:
+          - /url: /
+          - img [ref=e45]
+          - text: Dashboard
+        - link "Students" [ref=e50] [cursor=pointer]:
+          - /url: /students
+          - img [ref=e51]
+          - text: Students
+        - link "Payments" [ref=e56] [cursor=pointer]:
+          - /url: /payments
+          - img [ref=e57]
+          - text: Payments
+        - link "Receipts" [ref=e59] [cursor=pointer]:
+          - /url: /receipts
+          - img [ref=e60]
+          - text: Receipts
+        - link "Certificates" [ref=e63] [cursor=pointer]:
+          - /url: /certificates
+          - img [ref=e64]
+          - text: Certificates
+        - link "Internship Letters" [ref=e67] [cursor=pointer]:
+          - /url: /internship-letters
+          - img [ref=e68]
+          - text: Internship Letters
+        - link "Reports" [ref=e71] [cursor=pointer]:
+          - /url: /reports
+          - img [ref=e72]
+          - text: Reports
+        - link "User Management" [ref=e75] [cursor=pointer]:
+          - /url: /admin/users
+          - img [ref=e76]
+          - text: User Management
+      - button "Logout" [ref=e80] [cursor=pointer]:
+        - img [ref=e81]
+        - text: Logout
+    - generic [ref=e84]:
+      - banner [ref=e85]:
+        - generic [ref=e87]:
+          - heading "Dashboard Overview" [level=2] [ref=e88]
+          - paragraph [ref=e89]: Welcome back, Super Admin! 👋
+        - generic [ref=e90]:
+          - generic [ref=e91]:
+            - img [ref=e92]
+            - textbox "Search..." [ref=e95]
+          - generic [ref=e96]:
+            - button [ref=e97] [cursor=pointer]:
+              - img [ref=e98]
+            - generic [ref=e101]:
+              - generic [ref=e102]: S
+              - generic [ref=e103]:
+                - paragraph [ref=e104]: Super Admin
+                - paragraph [ref=e105]: admin
+      - main [ref=e106]:
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - generic [ref=e111]:
+              - generic [ref=e112]:
+                - generic [ref=e113]:
+                  - img [ref=e115]
+                  - generic [ref=e119]:
+                    - paragraph [ref=e120]: Total Revenue
+                    - heading "₹14,000" [level=3] [ref=e121]
+                - button [ref=e122] [cursor=pointer]:
+                  - img [ref=e123]
+              - generic [ref=e127]:
+                - generic [ref=e128]:
+                  - img [ref=e129]
+                  - text: 12.5%
+                - paragraph [ref=e131]: vs last month
+            - generic [ref=e133]:
+              - generic [ref=e134]:
+                - generic [ref=e135]:
+                  - img [ref=e137]
+                  - generic [ref=e140]:
+                    - paragraph [ref=e141]: Pending Amount
+                    - heading "₹14,000" [level=3] [ref=e142]
+                - button [ref=e143] [cursor=pointer]:
+                  - img [ref=e144]
+              - generic [ref=e148]:
+                - generic [ref=e149]:
+                  - img [ref=e150]
+                  - text: 8.2%
+                - paragraph [ref=e152]: vs last month
+            - generic [ref=e154]:
+              - generic [ref=e155]:
+                - generic [ref=e156]:
+                  - img [ref=e158]
+                  - generic [ref=e163]:
+                    - paragraph [ref=e164]: Total Students
+                    - heading "8" [level=3] [ref=e165]
+                - button [ref=e166] [cursor=pointer]:
+                  - img [ref=e167]
+              - generic [ref=e171]:
+                - generic [ref=e172]:
+                  - img [ref=e173]
+                  - text: 10.3%
+                - paragraph [ref=e175]: vs last month
+            - generic [ref=e177]:
+              - generic [ref=e178]:
+                - generic [ref=e179]:
+                  - img [ref=e181]
+                  - generic [ref=e184]:
+                    - paragraph [ref=e185]: Today's Collection
+                    - heading "₹1,000" [level=3] [ref=e186]
+                - button [ref=e187] [cursor=pointer]:
+                  - img [ref=e188]
+              - generic [ref=e192]:
+                - generic [ref=e193]:
+                  - img [ref=e194]
+                  - text: 15.3%
+                - paragraph [ref=e196]: vs last month
+          - generic [ref=e197]:
+            - generic [ref=e198]:
+              - generic [ref=e199]:
+                - heading "Revenue Overview" [level=4] [ref=e201]
+                - generic [ref=e203]:
+                  - button "Weekly" [ref=e204] [cursor=pointer]
+                  - button "Monthly" [ref=e205] [cursor=pointer]
+              - img [ref=e209]:
+                - generic [ref=e215]: Jun
+                - generic [ref=e217]:
+                  - generic [ref=e219]: ₹0K
+                  - generic [ref=e221]: ₹3.5K
+                  - generic [ref=e223]: ₹7K
+                  - generic [ref=e225]: ₹10.5K
+                  - generic [ref=e227]: ₹14K
+            - generic [ref=e232]:
+              - heading "Course Distribution" [level=4] [ref=e233]
+              - paragraph [ref=e234]: Revenue & Enrolled Students
+              - generic [ref=e235]:
+                - generic [ref=e237]:
+                  - generic [ref=e240]: Full Stack Development
+                  - generic [ref=e241]:
+                    - generic [ref=e242]: ₹13,000
+                    - generic [ref=e243]: (7 students)
+                - generic [ref=e247]:
+                  - generic [ref=e250]: Python Programming
+                  - generic [ref=e251]:
+                    - generic [ref=e252]: ₹1,000
+                    - generic [ref=e253]: (1 student)
+          - generic [ref=e256]:
+            - generic [ref=e257]:
+              - heading "Recent Transactions" [level=4] [ref=e258]
+              - link "View All" [ref=e259] [cursor=pointer]:
+                - /url: /reports
+                - text: View All
+                - img [ref=e260]
+            - table [ref=e263]:
+              - rowgroup [ref=e264]:
+                - row "Receipt ID Student Name Course Amount Status Date Action" [ref=e265]:
+                  - columnheader "Receipt ID" [ref=e266]
+                  - columnheader "Student Name" [ref=e267]
+                  - columnheader "Course" [ref=e268]
+                  - columnheader "Amount" [ref=e269]
+                  - columnheader "Status" [ref=e270]
+                  - columnheader "Date" [ref=e271]
+                  - columnheader "Action" [ref=e272]
+              - rowgroup [ref=e273]:
+                - row "T260624211301537173 Rijvan khan Python Programming ₹500 Paid 27 Jun 2026" [ref=e274]:
+                  - cell "T260624211301537173" [ref=e275]
+                  - cell "Rijvan khan" [ref=e276]
+                  - cell "Python Programming" [ref=e277]
+                  - cell "₹500" [ref=e278]
+                  - cell "Paid" [ref=e279]
+                  - cell "27 Jun 2026" [ref=e280]
+                  - cell [ref=e281]:
+                    - button [ref=e282] [cursor=pointer]:
+                      - img [ref=e283]
+                - row "T260624211301537173 Rijvan khan Python Programming ₹500 Paid 27 Jun 2026" [ref=e287]:
+                  - cell "T260624211301537173" [ref=e288]
+                  - cell "Rijvan khan" [ref=e289]
+                  - cell "Python Programming" [ref=e290]
+                  - cell "₹500" [ref=e291]
+                  - cell "Paid" [ref=e292]
+                  - cell "27 Jun 2026" [ref=e293]
+                  - cell [ref=e294]:
+                    - button [ref=e295] [cursor=pointer]:
+                      - img [ref=e296]
+                - row "617459169390 Sahil Talmale Full Stack Development ₹3,000 Paid 26 Jun 2026" [ref=e300]:
+                  - cell "617459169390" [ref=e301]
+                  - cell "Sahil Talmale" [ref=e302]
+                  - cell "Full Stack Development" [ref=e303]
+                  - cell "₹3,000" [ref=e304]
+                  - cell "Paid" [ref=e305]
+                  - cell "26 Jun 2026" [ref=e306]
+                  - cell [ref=e307]:
+                    - button [ref=e308] [cursor=pointer]:
+                      - img [ref=e309]
+                - row "T2606261247106984458234 MD Abunasar Full Stack Development ₹3,000 Paid 26 Jun 2026" [ref=e313]:
+                  - cell "T2606261247106984458234" [ref=e314]
+                  - cell "MD Abunasar" [ref=e315]
+                  - cell "Full Stack Development" [ref=e316]
+                  - cell "₹3,000" [ref=e317]
+                  - cell "Paid" [ref=e318]
+                  - cell "26 Jun 2026" [ref=e319]
+                  - cell [ref=e320]:
+                    - button [ref=e321] [cursor=pointer]:
+                      - img [ref=e322]
+                - row "654368065757 Akshay bainsla Full Stack Development ₹1,500 Paid 26 Jun 2026" [ref=e326]:
+                  - cell "654368065757" [ref=e327]
+                  - cell "Akshay bainsla" [ref=e328]
+                  - cell "Full Stack Development" [ref=e329]
+                  - cell "₹1,500" [ref=e330]
+                  - cell "Paid" [ref=e331]
+                  - cell "26 Jun 2026" [ref=e332]
+                  - cell [ref=e333]:
+                    - button [ref=e334] [cursor=pointer]:
+                      - img [ref=e335]
+  - generic [ref=e339]: ₹0K
