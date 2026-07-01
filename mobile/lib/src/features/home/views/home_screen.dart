@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../sync/providers/sync_provider.dart';
+import '../../courses/providers/course_provider.dart';
 import '../../../core/theme/app_theme.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -19,6 +20,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     Future.microtask(() {
       ref.read(syncProvider.notifier).syncOfflineData();
+      ref.read(courseProvider.notifier).fetchBatches();
     });
   }
 
@@ -30,8 +32,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final student = user?.student;
     final String welcomeName = user != null ? '${user.firstName} ${user.lastName}' : 'Student';
 
+    final courseState = ref.watch(courseProvider);
+    final firstBatch = courseState.batches.isNotEmpty ? courseState.batches[0] : null;
+    final num completionPct = firstBatch != null ? (firstBatch['completionPct'] as num? ?? 0.0) : 0.0;
+
     // UI Calculations
-    final int readinessScore = student?.cgpa != null ? ((student!.cgpa! / 10.0) * 100).round() : 75;
+    final int readinessScore = student?.readinessScore != null ? student!.readinessScore!.round() : 75;
 
     return Scaffold(
       body: SafeArea(
@@ -108,7 +114,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              _buildCurriculumOverview(context, student),
+               _buildCurriculumOverview(context, student, completionPct),
               const SizedBox(height: 24),
 
               // Quick Actions
@@ -247,7 +253,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildCurriculumOverview(BuildContext context, StudentModel? student) {
+  Widget _buildCurriculumOverview(BuildContext context, StudentModel? student, num completionPct) {
     final String branch = student?.branch ?? 'Computer Science';
     final String code = student?.studentCode ?? 'KTC-STUDENT';
 
@@ -293,20 +299,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             // Progress Bar
             Row(
               children: [
-                const Expanded(
+                Expanded(
                   child: ClipRRect(
-                    borderRadius: BorderRadius.all(Radius.circular(4)),
+                    borderRadius: const BorderRadius.all(Radius.circular(4)),
                     child: LinearProgressIndicator(
-                      value: 0.15, // Mock value
+                      value: completionPct / 100.0,
                       minHeight: 6,
                       backgroundColor: AppTheme.border,
-                      valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
+                      valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Text(
-                  '15%',
+                  '${completionPct.toInt()}%',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

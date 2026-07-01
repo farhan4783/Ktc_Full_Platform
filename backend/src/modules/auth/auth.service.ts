@@ -6,6 +6,7 @@ import { AppError } from '../../middleware/errorHandler';
 import { generateOtp, generateRandomToken, hashToken, generateStudentCode } from '../../utils/codeGenerator';
 import { addJob, JOBS } from '../../services/queue.service';
 import { logger } from '../../utils/logger';
+import { calculateReadinessScore } from '../student/student.service';
 import type {
   RegisterInput,
   VerifyEmailInput,
@@ -645,6 +646,11 @@ export async function getCurrentUser(userId: string) {
 
   if (!user) {
     throw new AppError('User not found', 404, 'USER_NOT_FOUND');
+  }
+
+  if (user.student) {
+    const readinessScore = await calculateReadinessScore(user.student.id);
+    (user.student as any).readinessScore = readinessScore;
   }
 
   return user;

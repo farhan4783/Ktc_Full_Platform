@@ -70,6 +70,7 @@ class StudentModel {
   final String? resumeUrl;
   final String? linkedinUrl;
   final String? githubUrl;
+  final double? readinessScore;
 
   StudentModel({
     required this.id,
@@ -85,6 +86,7 @@ class StudentModel {
     this.resumeUrl,
     this.linkedinUrl,
     this.githubUrl,
+    this.readinessScore,
   });
 
   factory StudentModel.fromJson(Map<String, dynamic> json) {
@@ -102,6 +104,7 @@ class StudentModel {
       resumeUrl: json['resumeUrl'] as String?,
       linkedinUrl: json['linkedinUrl'] as String?,
       githubUrl: json['githubUrl'] as String?,
+      readinessScore: json['readinessScore'] != null ? (json['readinessScore'] as num).toDouble() : null,
     );
   }
 
@@ -120,6 +123,7 @@ class StudentModel {
       'resumeUrl': resumeUrl,
       'linkedinUrl': linkedinUrl,
       'githubUrl': githubUrl,
+      'readinessScore': readinessScore,
     };
   }
 }
