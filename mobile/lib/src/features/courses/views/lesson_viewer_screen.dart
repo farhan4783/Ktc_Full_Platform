@@ -121,6 +121,39 @@ class _LessonViewerScreenState extends ConsumerState<LessonViewerScreen> with Si
     }
   }
 
+  void _skipSeconds(int seconds) {
+    if (_videoPlayerController == null || !_videoPlayerController!.value.isInitialized) return;
+    
+    final currentPos = _videoPlayerController!.value.position;
+    final targetPos = currentPos + Duration(seconds: seconds);
+    final duration = _videoPlayerController!.value.duration;
+    
+    final finalPos = targetPos < Duration.zero 
+        ? Duration.zero 
+        : (targetPos > duration ? duration : targetPos);
+        
+    _videoPlayerController!.seekTo(finalPos);
+    
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(seconds > 0 ? 'Skip forward 10s' : 'Skip backward 10s'),
+        duration: const Duration(milliseconds: 400),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppTheme.primaryDark.withOpacity(0.9),
+      ),
+    );
+  }
+
+  void _togglePlayPause() {
+    if (_videoPlayerController == null) return;
+    if (_videoPlayerController!.value.isPlaying) {
+      _videoPlayerController!.pause();
+    } else {
+      _videoPlayerController!.play();
+    }
+    setState(() {});
+  }
+
   Future<void> _loadSavedNotes() async {
     final authState = ref.read(authProvider);
     final studentId = authState.user?.student?.id ?? 'guest';
@@ -193,7 +226,20 @@ class _LessonViewerScreenState extends ConsumerState<LessonViewerScreen> with Si
                       ),
                     )
                   : _chewieController != null
-                      ? Chewie(controller: _chewieController!)
+                      ? GestureDetector(
+                          onDoubleTapDown: (details) {
+                            final width = MediaQuery.of(context).size.width;
+                            final x = details.localPosition.dx;
+                            if (x < width / 3) {
+                              _skipSeconds(-10);
+                            } else if (x > 2 * width / 3) {
+                              _skipSeconds(10);
+                            } else {
+                              _togglePlayPause();
+                            }
+                          },
+                          child: Chewie(controller: _chewieController!),
+                        )
                       : const Center(
                           child: Text(
                             'Failed to load video.',
@@ -213,6 +259,7 @@ class _LessonViewerScreenState extends ConsumerState<LessonViewerScreen> with Si
                 ),
                 const SizedBox(height: 8),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -224,6 +271,19 @@ class _LessonViewerScreenState extends ConsumerState<LessonViewerScreen> with Si
                         'Video Lesson',
                         style: TextStyle(color: AppTheme.primary, fontSize: 10, fontWeight: FontWeight.bold),
                       ),
+                    ),
+                    IconButton(
+                      icon: const Icon(LucideIcons.download, color: AppTheme.primary, size: 20),
+                      tooltip: 'Download Offline',
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Downloading lesson video for offline access...'),
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),

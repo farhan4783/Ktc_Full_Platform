@@ -35,4 +35,36 @@ export async function closeRedis(): Promise<void> {
   }
 }
 
+export async function getCache(key: string): Promise<string | null> {
+  try {
+    const client = getRedisClient();
+    return await client.get(key);
+  } catch (err: any) {
+    logger.error(`Error getting cache for key ${key}:`, err.message);
+    return null;
+  }
+}
+
+export async function setCache(key: string, value: string, ttlSeconds?: number): Promise<void> {
+  try {
+    const client = getRedisClient();
+    if (ttlSeconds) {
+      await client.set(key, value, 'EX', ttlSeconds);
+    } else {
+      await client.set(key, value);
+    }
+  } catch (err: any) {
+    logger.error(`Error setting cache for key ${key}:`, err.message);
+  }
+}
+
+export async function deleteCache(key: string): Promise<void> {
+  try {
+    const client = getRedisClient();
+    await client.del(key);
+  } catch (err: any) {
+    logger.error(`Error deleting cache for key ${key}:`, err.message);
+  }
+}
+
 export default getRedisClient;

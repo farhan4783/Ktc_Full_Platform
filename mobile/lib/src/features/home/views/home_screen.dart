@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:percent_indicator/percent_indicator.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../sync/providers/sync_provider.dart';
 import '../../courses/providers/course_provider.dart';
@@ -161,94 +162,77 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildReadinessCard(int score) {
-    return Card(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [
-              AppTheme.surface,
-              AppTheme.surface.withOpacity(0.4),
-            ],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
+    return Container(
+      decoration: AppTheme.glassDecoration(),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          // Circular Score gauge
+          CircularPercentIndicator(
+            radius: 35.0,
+            lineWidth: 6.0,
+            percent: score / 100.0,
+            animation: true,
+            animationDuration: 1200,
+            circularStrokeCap: CircularStrokeCap.round,
+            backgroundColor: AppTheme.border,
+            progressColor: AppTheme.primary,
+            center: Text(
+              '$score%',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
           ),
-        ),
-        padding: const EdgeInsets.all(20),
-        child: Row(
-          children: [
-            // Circular Score gauge
-            Stack(
-              alignment: Alignment.center,
+          const SizedBox(width: 20),
+          // Details
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  width: 70,
-                  height: 70,
-                  child: CircularProgressIndicator(
-                    value: score / 100.0,
-                    strokeWidth: 6,
-                    backgroundColor: AppTheme.border,
-                    valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
-                  ),
-                ),
-                Text(
-                  '$score%',
-                  style: const TextStyle(
-                    fontSize: 16,
+                const Text(
+                  'Placement Readiness Score',
+                  style: TextStyle(
+                    fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
                 ),
-              ],
-            ),
-            const SizedBox(width: 20),
-            // Details
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Placement Readiness Score',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Your score is computed from profile details, quiz results, and lesson attendance.',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: AppTheme.textSecondary,
+                    height: 1.3,
                   ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Your score is computed from profile details, quiz results, and lesson attendance.',
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: AppTheme.textSecondary,
-                      height: 1.3,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: AppTheme.primary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          score >= 75 ? 'Job Ready' : 'In Preparation',
-                          style: const TextStyle(
-                            fontSize: 10,
-                            color: AppTheme.primary,
-                            fontWeight: FontWeight.bold,
-                          ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: AppTheme.primary.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        score >= 75 ? 'Job Ready' : 'In Preparation',
+                        style: const TextStyle(
+                          fontSize: 10,
+                          color: AppTheme.primary,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -257,100 +241,114 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final String branch = student?.branch ?? 'Computer Science';
     final String code = student?.studentCode ?? 'KTC-STUDENT';
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+    return Container(
+      decoration: AppTheme.glassDecoration(),
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    branch,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'ID: $code',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+              const Icon(LucideIcons.graduationCap, color: AppTheme.primary, size: 28),
+            ],
+          ),
+          const SizedBox(height: 20),
+          const Text(
+            'Course Completion Progress',
+            style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
+          ),
+          const SizedBox(height: 8),
+          // Progress Bar with Gradient
+          Row(
+            children: [
+              Expanded(
+                child: Stack(
                   children: [
-                    Text(
-                      branch,
-                      style: const TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    Container(
+                      height: 6,
+                      decoration: BoxDecoration(
+                        color: AppTheme.border,
+                        borderRadius: BorderRadius.circular(4),
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'ID: $code',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppTheme.textSecondary,
-                      ),
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        final double pct = (completionPct / 100.0).clamp(0.0, 1.0);
+                        return Container(
+                          height: 6,
+                          width: constraints.maxWidth * pct,
+                          decoration: BoxDecoration(
+                            gradient: AppTheme.accentGradient,
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        );
+                      }
                     ),
-                  ],
-                ),
-                const Icon(LucideIcons.graduationCap, color: AppTheme.primary, size: 28),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Course Completion Progress',
-              style: TextStyle(fontSize: 12, color: AppTheme.textSecondary),
-            ),
-            const SizedBox(height: 8),
-            // Progress Bar
-            Row(
-              children: [
-                Expanded(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(4)),
-                    child: LinearProgressIndicator(
-                      value: completionPct / 100.0,
-                      minHeight: 6,
-                      backgroundColor: AppTheme.border,
-                      valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Text(
-                  '${completionPct.toInt()}%',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    color: AppTheme.textSecondary,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            // Resume Learning Action
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => context.go('/learn'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppTheme.border,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: const BorderSide(color: AppTheme.primary, width: 0.5),
-                  ),
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Resume Learning',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
-                    ),
-                    SizedBox(width: 8),
-                    Icon(LucideIcons.playCircle, size: 16, color: AppTheme.primary),
                   ],
                 ),
               ),
+              const SizedBox(width: 12),
+              Text(
+                '${completionPct.toInt()}%',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          // Resume Learning Action
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () => context.go('/learn'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.border,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  side: const BorderSide(color: AppTheme.primary, width: 0.5),
+                ),
+              ),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Resume Learning',
+                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                  ),
+                  SizedBox(width: 8),
+                  Icon(LucideIcons.playCircle, size: 16, color: AppTheme.primary),
+                ],
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

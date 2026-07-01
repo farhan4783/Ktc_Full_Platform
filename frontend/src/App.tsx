@@ -20,6 +20,7 @@ import Attendance from './pages/Attendance';
 import Grading from './pages/Grading';
 import VerifyCertificate from './pages/VerifyCertificate';
 import RecruiterDashboard from './pages/RecruiterDashboard';
+import CertificateDesigner from './pages/CertificateDesigner';
 
 
 const queryClient = new QueryClient();
@@ -55,6 +56,7 @@ export default function App() {
                     {/* LMS Scoped */}
                     <Route path="courses" element={<Courses />} />
                     <Route path="batches" element={<Batches />} />
+                    <Route path="certificate-designer" element={<CertificateDesigner />} />
                     
                     {/* CRM & Placement Scoped */}
                     <Route path="placements" element={<Placements />} />

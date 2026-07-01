@@ -24,5 +24,11 @@ export const importStudentsSchema = z.object({
   csvData: z.string().min(1, 'CSV data string is required'), // Base64 or raw string
 });
 
+export const evaluateMockInterviewSchema = z.object({
+  question: z.string().min(1, 'Question is required'),
+  answer: z.string().min(1, 'Answer is required'),
+});
+
 export type UpdateStudentProfileInput = z.infer<typeof updateStudentProfileSchema>;
 export type ImportStudentsInput = z.infer<typeof importStudentsSchema>;
+export type EvaluateMockInterviewInput = z.infer<typeof evaluateMockInterviewSchema>;

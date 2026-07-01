@@ -81,6 +81,18 @@ export async function trackInterest(req: Request, res: Response, next: NextFunct
   }
 }
 
+export async function updateInterestStatus(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { id, studentId } = req.params; // jobId, studentId
+    const { status } = req.body;
+
+    const interest = await jobService.trackInterest(id, studentId, status);
+    sendSuccess(res, interest, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
 export async function getMyInterests(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const student = await prisma.student.findUnique({

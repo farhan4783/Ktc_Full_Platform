@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:shimmer/shimmer.dart';
 import '../providers/course_provider.dart';
 import '../../../core/theme/app_theme.dart';
 
@@ -35,9 +36,22 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
         elevation: 0,
       ),
       body: state.isLoading
-          ? const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primary),
+          ? Shimmer.fromColors(
+              baseColor: const Color(0xFF0C1324),
+              highlightColor: const Color(0xFF1E293B),
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                itemCount: 3,
+                itemBuilder: (context, index) {
+                  return Container(
+                    height: 140,
+                    margin: const EdgeInsets.only(bottom: 16.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  );
+                },
               ),
             )
           : state.errorMessage != null
@@ -92,10 +106,7 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
 
                         return Container(
                           margin: const EdgeInsets.only(bottom: 16.0),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: AppTheme.border, width: 1),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
+                          decoration: AppTheme.glassDecoration(),
                           child: InkWell(
                             onTap: () {
                               if (courseId.isNotEmpty) {
@@ -162,14 +173,30 @@ class _LearnScreenState extends ConsumerState<LearnScreen> {
                                     ],
                                   ),
                                   const SizedBox(height: 8),
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.all(Radius.circular(4)),
-                                    child: LinearProgressIndicator(
-                                      value: completionPct / 100.0,
-                                      minHeight: 6,
-                                      backgroundColor: AppTheme.border,
-                                      valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
-                                    ),
+                                  // Gradient Progress Bar
+                                  Stack(
+                                    children: [
+                                      Container(
+                                        height: 6,
+                                        decoration: BoxDecoration(
+                                          color: AppTheme.border,
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                      ),
+                                      LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          final double pct = (completionPct / 100.0).clamp(0.0, 1.0);
+                                          return Container(
+                                            height: 6,
+                                            width: constraints.maxWidth * pct,
+                                            decoration: BoxDecoration(
+                                              gradient: AppTheme.accentGradient,
+                                              borderRadius: BorderRadius.circular(4),
+                                            ),
+                                          );
+                                        }
+                                      ),
+                                    ],
                                   ),
                                 ],
                               ),

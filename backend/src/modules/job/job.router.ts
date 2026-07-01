@@ -57,4 +57,11 @@ router.post(
   jobController.trackInterest
 );
 
+router.patch(
+  '/:id/interests/:studentId',
+  requireRole('SUPER_ADMIN', 'COLLEGE_ADMIN', 'RECRUITER'),
+  validateBody(trackInterestSchema),
+  jobController.updateInterestStatus
+);
+
 export default router;

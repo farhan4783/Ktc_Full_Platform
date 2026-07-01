@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/quiz_provider.dart';
 import '../../../core/theme/app_theme.dart';
 
@@ -40,6 +42,7 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
     Future.microtask(() async {
       final success = await ref.read(quizProvider.notifier).startQuizAttempt(widget.quizId);
       if (success && mounted) {
+        await _loadDraftAnswers();
         setState(() {
           _started = true;
         });
@@ -60,11 +63,71 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
         setState(() {
           _secondsRemaining--;
         });
+        
+        // Gamified haptic notifications at time boundaries
+        if (_secondsRemaining == 300) {
+          HapticFeedback.vibrate();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('⚠️ 5 minutes remaining!'),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.amber,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        } else if (_secondsRemaining == 60) {
+          HapticFeedback.vibrate();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('🚨 1 minute remaining! Double check your answers.'),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.redAccent,
+              duration: Duration(seconds: 3),
+            ),
+          );
+        } else if (_secondsRemaining < 60 && _secondsRemaining % 10 == 0) {
+          HapticFeedback.lightImpact();
+        }
       } else {
         _timer?.cancel();
         _autoSubmit();
       }
     });
+  }
+
+  Future<void> _saveDraftAnswers() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final List<String> encoded = [];
+      _selectedAnswers.forEach((qId, optIds) {
+        encoded.add('$qId:${optIds.join(",")}');
+      });
+      await prefs.setStringList('draft_${widget.quizId}', encoded);
+    } catch (_) {}
+  }
+
+  Future<void> _loadDraftAnswers() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final List<String>? encoded = prefs.getStringList('draft_${widget.quizId}');
+      if (encoded != null) {
+        for (final item in encoded) {
+          final parts = item.split(':');
+          if (parts.length == 2 && parts[1].isNotEmpty) {
+            final qId = parts[0];
+            final optIds = parts[1].split(',');
+            _selectedAnswers[qId] = optIds;
+          }
+        }
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _clearDraftAnswers() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('draft_${widget.quizId}');
+    } catch (_) {}
   }
 
   String _formatTime(int totalSeconds) {
@@ -134,6 +197,7 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
         );
 
     if (result != null && mounted) {
+      await _clearDraftAnswers();
       final score = result['score'] ?? 0;
       final maxScore = result['maxScore'] ?? 0;
       final passed = result['passed'] as bool? ?? false;
@@ -204,6 +268,7 @@ class _QuizAttemptScreenState extends ConsumerState<QuizAttemptScreen> {
         _selectedAnswers[questionId] = [optionId];
       }
     });
+    _saveDraftAnswers();
   }
 
   @override

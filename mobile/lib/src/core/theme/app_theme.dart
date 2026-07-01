@@ -11,6 +11,42 @@ class AppTheme {
   static const Color textSecondary = Color(0xFF94A3B8);
   static const Color border = Color(0xFF1E293B);
 
+  // Gradients for backgrounds and accents
+  static const LinearGradient premiumGradient = LinearGradient(
+    colors: [
+      Color(0xFF040712), // Pitch dark blue
+      Color(0xFF0C1324), // Surface deep blue
+      Color(0xFF16113A), // Dark purple tint
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  static const LinearGradient accentGradient = LinearGradient(
+    colors: [
+      Color(0xFF00D2FF), // Cyan
+      Color(0xFF0072FF), // Electric Blue
+      Color(0xFF8B5CF6), // Premium Violet
+    ],
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+  );
+
+  // Glassmorphic container helper
+  static BoxDecoration glassDecoration({
+    Color? color,
+    double borderRadius = 16.0,
+  }) {
+    return BoxDecoration(
+      color: color ?? surface.withOpacity(0.55),
+      borderRadius: BorderRadius.circular(borderRadius),
+      border: Border.all(
+        color: Colors.white.withOpacity(0.08),
+        width: 1.0,
+      ),
+    );
+  }
+
   static ThemeData get darkTheme {
     return ThemeData.dark().copyWith(
       scaffoldBackgroundColor: background,

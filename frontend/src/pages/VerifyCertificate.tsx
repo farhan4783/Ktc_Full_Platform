@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import apiClient from '../config/axios';
-import { CheckCircle2, AlertTriangle, ExternalLink, Calendar, ShieldCheck, Award, Share2 } from 'lucide-react';
+import { AlertTriangle, ExternalLink, Calendar, ShieldCheck, Award, Share2 } from 'lucide-react';
 
 interface CertificateData {
   id: string;

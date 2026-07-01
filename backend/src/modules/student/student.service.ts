@@ -4,6 +4,7 @@ import { UpdateStudentProfileInput } from './student.schema';
 import { getPaginationOffset } from '../../utils/pagination';
 import { generateStudentCode, generateTempPassword } from '../../utils/codeGenerator';
 import bcrypt from 'bcryptjs';
+import { logger } from '../../utils/logger';
 
 export async function getStudents(
   page: number,
@@ -197,10 +198,38 @@ export async function updateStudent(id: string, data: UpdateStudentProfileInput)
     if (data.cgpa !== undefined) studentUpdates.cgpa = data.cgpa;
     if (data.gender !== undefined) studentUpdates.gender = data.gender;
     if (data.dateOfBirth !== undefined) studentUpdates.dateOfBirth = data.dateOfBirth;
-    if (data.resumeUrl !== undefined) studentUpdates.resumeUrl = data.resumeUrl;
+    
+    if (data.resumeUrl !== undefined) {
+      studentUpdates.resumeUrl = data.resumeUrl;
+      
+      // Hook up parser if resume is a PDF
+      if (data.resumeUrl && data.resumeUrl.toLowerCase().endsWith('.pdf')) {
+        try {
+          const axios = require('axios');
+          const { parseResumePdf } = require('../../services/resume.service');
+          
+          logger.info(`Fetching resume PDF from: ${data.resumeUrl} for parsing...`);
+          const response = await axios.get(data.resumeUrl, { responseType: 'arraybuffer' });
+          const buffer = Buffer.from(response.data);
+          
+          const parsed = await parseResumePdf(buffer);
+          logger.info(`Parsed resume skills: ${parsed.skills.join(', ')}`);
+          
+          if (parsed.skills.length > 0) {
+            // Merge existing student skills with newly parsed ones
+            const existingSkills = data.skills !== undefined ? data.skills : (student.skills || []);
+            const mergedSkills = Array.from(new Set([...existingSkills, ...parsed.skills]));
+            studentUpdates.skills = mergedSkills;
+          }
+        } catch (err: any) {
+          logger.error('Failed to parse resume upon update:', err.message);
+        }
+      }
+    }
+    
     if (data.linkedinUrl !== undefined) studentUpdates.linkedinUrl = data.linkedinUrl;
     if (data.githubUrl !== undefined) studentUpdates.githubUrl = data.githubUrl;
-    if (data.skills !== undefined) studentUpdates.skills = data.skills;
+    if (data.skills !== undefined && studentUpdates.skills === undefined) studentUpdates.skills = data.skills;
     if (data.placementStatus !== undefined) studentUpdates.placementStatus = data.placementStatus;
 
     // Auto calculate if profile is completed

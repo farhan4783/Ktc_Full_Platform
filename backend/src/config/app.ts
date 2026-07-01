@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
+import compression from 'compression';
 import { errorHandler } from '../middleware/errorHandler';
 
 export function createApp() {
@@ -9,6 +10,9 @@ export function createApp() {
 
   // Security
   app.use(helmet());
+
+  // Compression
+  app.use(compression());
 
   const corsOrigins = process.env.CORS_ORIGINS?.split(',') || [];
   app.use(

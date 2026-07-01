@@ -13,7 +13,6 @@ import {
   Building,
   Globe,
   Sliders,
-  ArrowRight,
   GraduationCap,
   CheckCircle2,
   Clock,

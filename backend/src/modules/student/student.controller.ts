@@ -2,6 +2,8 @@ import { Request, Response, NextFunction } from 'express';
 import * as studentService from './student.service';
 import { sendSuccess } from '../../utils/response';
 import { AppError } from '../../middleware/errorHandler';
+import { evaluateMockInterview } from '../../services/ai.service';
+import { getCache, setCache, deleteCache } from '../../config/redis';
 
 export async function getStudents(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -31,7 +33,16 @@ export async function getStudents(req: Request, res: Response, next: NextFunctio
 export async function getStudent(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { id } = req.params;
-    const student = await studentService.getStudentById(id);
+    const cacheKey = `student:${id}`;
+
+    let student;
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) {
+      student = JSON.parse(cachedData);
+    } else {
+      student = await studentService.getStudentById(id);
+      await setCache(cacheKey, JSON.stringify(student), 60); // cache for 60 seconds
+    }
 
     // Enforce multi-tenancy: College Admin can only view their own college's students
     if (req.user?.role === 'COLLEGE_ADMIN' && student.collegeId !== req.user.collegeId) {
@@ -65,6 +76,7 @@ export async function updateStudent(req: Request, res: Response, next: NextFunct
     }
 
     const updated = await studentService.updateStudent(id, req.body);
+    await deleteCache(`student:${id}`); // Invalidate cache
     sendSuccess(res, updated, 200);
   } catch (error) {
     next(error);
@@ -99,6 +111,23 @@ export async function saveLessonProgress(req: Request, res: Response, next: Next
 
     const progress = await studentService.saveProgress(id, lessonId, videoProgressSecs, isCompleted);
     sendSuccess(res, progress, 200);
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function evaluateStudentMockInterview(req: Request, res: Response, next: NextFunction): Promise<void> {
+  try {
+    const { id } = req.params; // student ID
+    const { question, answer } = req.body;
+
+    const student = await studentService.getStudentById(id);
+    if (req.user?.role === 'STUDENT' && student.userId !== req.user.userId) {
+      throw new AppError('Access denied: You can only take mock interviews for your own profile', 403, 'FORBIDDEN');
+    }
+
+    const result = await evaluateMockInterview(question, answer);
+    sendSuccess(res, result, 200);
   } catch (error) {
     next(error);
   }

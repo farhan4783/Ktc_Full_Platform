@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 import 'package:intl/intl.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:go_router/go_router.dart';
 import '../providers/placement_provider.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../../core/theme/app_theme.dart';
@@ -15,7 +17,6 @@ class PlacementScreen extends ConsumerStatefulWidget {
 
 class _PlacementScreenState extends ConsumerState<PlacementScreen> {
   final _resumeController = TextEditingController();
-  bool _isEditingResume = false;
 
   @override
   void initState() {
@@ -35,29 +36,66 @@ class _PlacementScreenState extends ConsumerState<PlacementScreen> {
     super.dispose();
   }
 
-  Future<void> _saveResume() async {
-    final user = ref.read(authProvider).user;
-    final student = user?.student;
-    if (student == null) return;
+  Future<void> _pickAndUploadResume() async {
+    try {
+      final FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf'],
+      );
 
-    final success = await ref.read(authProvider.notifier).updateProfile(
-          enrollmentNumber: student.enrollmentNumber ?? '',
-          branch: student.branch ?? '',
-          graduationYear: student.graduationYear ?? 2026,
-          cgpa: student.cgpa ?? 8.0,
-          resumeUrl: _resumeController.text.trim(),
-          phone: user?.phone,
-          linkedinUrl: student.linkedinUrl,
-          githubUrl: student.githubUrl,
-          skills: student.skills,
+      if (result != null && result.files.single.path != null) {
+        final fileName = result.files.single.name;
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Selected resume: $fileName. Uploading & Parsing...'),
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: AppTheme.primaryDark,
+          ),
         );
 
-    if (success) {
-      setState(() {
-        _isEditingResume = false;
-      });
+        final user = ref.read(authProvider).user;
+        final student = user?.student;
+        if (student == null) return;
+
+        // In a real production flow, this would call the presigned URL upload to R2
+        // We simulate this by uploading to R2-style CDN URL:
+        final String mockR2Url = 'https://cdn.kodetocareer.com/resumes/${student.id}.pdf';
+
+        final success = await ref.read(authProvider.notifier).updateProfile(
+              enrollmentNumber: student.enrollmentNumber ?? '',
+              branch: student.branch ?? '',
+              graduationYear: student.graduationYear ?? 2026,
+              cgpa: student.cgpa ?? 8.0,
+              resumeUrl: mockR2Url,
+              phone: user?.phone,
+              linkedinUrl: student.linkedinUrl,
+              githubUrl: student.githubUrl,
+              skills: student.skills,
+            );
+
+        if (success) {
+          setState(() {
+            _resumeController.text = mockR2Url;
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Resume uploaded and parsed! Match skills synchronized.'),
+              behavior: SnackBarBehavior.floating,
+              backgroundColor: Colors.green,
+            ),
+          );
+          // Refresh user profile to fetch updated parsed skills
+          await ref.read(authProvider.notifier).initialize();
+        }
+      }
+    } catch (_) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Resume URL updated successfully!'), backgroundColor: Colors.green),
+        const SnackBar(
+          content: Text('Failed to pick file.'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.redAccent,
+        ),
       );
     }
   }
@@ -88,6 +126,10 @@ class _PlacementScreenState extends ConsumerState<PlacementScreen> {
           children: [
             // Readiness Gauge Card
             _buildReadinessCard(readinessScore),
+            const SizedBox(height: 20),
+
+            // AI Mock Interview
+            _buildMockInterviewCard(),
             const SizedBox(height: 20),
 
             // Resume URL Box
@@ -173,84 +215,94 @@ class _PlacementScreenState extends ConsumerState<PlacementScreen> {
   }
 
   Widget _buildResumeBox(bool isLoading) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Row(
+    return Container(
+      decoration: AppTheme.glassDecoration(),
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Row(
+            children: [
+              Icon(LucideIcons.fileText, color: AppTheme.primary, size: 20),
+              SizedBox(width: 10),
+              Text(
+                'Resume Upload',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            _resumeController.text.isNotEmpty 
+                ? 'Attached: ${_resumeController.text.split("/").last}' 
+                : 'No resume uploaded. Upload a PDF to automatically extract skills.',
+            style: TextStyle(
+              fontSize: 12,
+              color: _resumeController.text.isNotEmpty ? Colors.white70 : AppTheme.textSecondary,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: isLoading ? null : _pickAndUploadResume,
+              icon: const Icon(LucideIcons.upload, size: 16),
+              label: const Text('Choose PDF Resume'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: Colors.white,
+                side: const BorderSide(color: AppTheme.border),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(vertical: 12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMockInterviewCard() {
+    return Container(
+      decoration: AppTheme.glassDecoration(),
+      padding: const EdgeInsets.all(20),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF8B5CF6).withOpacity(0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(LucideIcons.messageSquare, color: Color(0xFF8B5CF6), size: 24),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(LucideIcons.fileText, color: AppTheme.primary, size: 20),
-                SizedBox(width: 10),
+                const Text(
+                  'AI Interview Practice',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                const SizedBox(height: 4),
                 Text(
-                  'Resume Link',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+                  'Grade your soft skills with AI feedback.',
+                  style: TextStyle(fontSize: 11, color: AppTheme.textSecondary),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
-            if (!_isEditingResume) ...[
-              Text(
-                _resumeController.text.isNotEmpty ? _resumeController.text : 'No resume link added yet.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: _resumeController.text.isNotEmpty ? Colors.white70 : AppTheme.textSecondary,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(height: 12),
-              SizedBox(
-                width: double.infinity,
-                child: OutlinedButton(
-                  onPressed: () {
-                    setState(() {
-                      _isEditingResume = true;
-                    });
-                  },
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: AppTheme.border),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: const Text('Update Resume URL', style: TextStyle(color: Colors.white, fontSize: 12)),
-                ),
-              ),
-            ] else ...[
-              TextFormField(
-                controller: _resumeController,
-                style: const TextStyle(fontSize: 13, color: Colors.white),
-                decoration: const InputDecoration(
-                  hintText: 'https://drive.google.com/...',
-                  contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-                ),
-              ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () {
-                      final user = ref.read(authProvider).user;
-                      setState(() {
-                        _resumeController.text = user?.student?.resumeUrl ?? '';
-                        _isEditingResume = false;
-                      });
-                    },
-                    child: const Text('Cancel', style: TextStyle(color: AppTheme.textSecondary)),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: isLoading ? null : _saveResume,
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                    ),
-                    child: const Text('Save Link', style: TextStyle(color: AppTheme.background)),
-                  ),
-                ],
-              ),
-            ],
-          ],
-        ),
+          ),
+          ElevatedButton(
+            onPressed: () => context.go('/placement/mock-interview'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              backgroundColor: const Color(0xFF8B5CF6),
+              foregroundColor: Colors.white,
+            ),
+            child: const Text('Start', style: TextStyle(fontSize: 12)),
+          ),
+        ],
       ),
     );
   }

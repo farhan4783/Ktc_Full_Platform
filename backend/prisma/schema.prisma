@@ -804,6 +804,7 @@ model QuizAttempt {
 
   @@index([quizId])
   @@index([studentId])
+  @@index([quizId, studentId])
   @@index([status])
   @@map("quiz_attempts")
 }
@@ -1101,6 +1102,7 @@ model JobInterest {
   @@unique([jobId, studentId])
   @@index([jobId])
   @@index([studentId])
+  @@index([status])
   @@map("job_interests")
 }
 

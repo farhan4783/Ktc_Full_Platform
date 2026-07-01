@@ -3,12 +3,61 @@ import { AppError } from '../../middleware/errorHandler';
 import { getPaginationOffset } from '../../utils/pagination';
 
 export async function createJob(data: any, postedBy: string) {
-  return prisma.jobOpportunity.create({
+  const job = await prisma.jobOpportunity.create({
     data: {
       ...data,
       postedBy,
     },
   });
+
+  // Broadcast job alert via WhatsApp to matching students asynchronously
+  setTimeout(async () => {
+    try {
+      const where: any = {};
+      const targetColleges = (job.targetColleges as string[]) || [];
+      const targetBatches = (job.targetBatches as string[]) || [];
+
+      if (targetColleges.length > 0 && targetBatches.length > 0) {
+        where.AND = [
+          { collegeId: { in: targetColleges } },
+          { batchStudents: { some: { batchId: { in: targetBatches } } } }
+        ];
+      } else if (targetColleges.length > 0) {
+        where.collegeId = { in: targetColleges };
+      } else if (targetBatches.length > 0) {
+        where.batchStudents = { some: { batchId: { in: targetBatches } } };
+      }
+
+      const students = await prisma.student.findMany({
+        where,
+        include: {
+          user: {
+            select: { phone: true }
+          }
+        }
+      });
+
+      const { sendWhatsAppJobAlert } = require('../../services/whatsapp.service');
+      const deadlineStr = job.applyDeadline
+        ? new Date(job.applyDeadline).toLocaleDateString()
+        : 'N/A';
+
+      for (const student of students) {
+        if (student.user.phone) {
+          await sendWhatsAppJobAlert(
+            student.user.phone,
+            job.title,
+            job.companyName,
+            deadlineStr
+          );
+        }
+      }
+    } catch (err) {
+      console.error('Failed to broadcast job alerts via WhatsApp', err);
+    }
+  }, 0);
+
+  return job;
 }
 
 export async function getJobs(page: number, limit: number, user: any, search?: string) {

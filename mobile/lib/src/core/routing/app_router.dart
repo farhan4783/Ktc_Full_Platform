@@ -15,6 +15,7 @@ import '../../features/courses/views/lesson_viewer_screen.dart';
 import '../../features/quizzes/views/quizzes_screen.dart';
 import '../../features/quizzes/views/quiz_attempt_screen.dart';
 import '../../features/profile/views/placement_screen.dart';
+import '../../features/profile/views/mock_interview_screen.dart';
 import '../../features/profile/views/profile_screen.dart';
 
 final appRouter = Provider<GoRouter>((ref) {
@@ -155,6 +156,12 @@ final appRouter = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/placement',
             builder: (context, state) => const PlacementScreen(),
+            routes: [
+              GoRoute(
+                path: 'mock-interview',
+                builder: (context, state) => const MockInterviewScreen(),
+              ),
+            ],
           ),
           GoRoute(
             path: '/profile',

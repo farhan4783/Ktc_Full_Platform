@@ -85,7 +85,7 @@ export async function markSessionAttendance(sessionId: string, records: any[], m
     }
 
     // Update session status
-    return tx.classSession.update({
+    const updatedSession = await tx.classSession.update({
       where: { id: sessionId },
       data: {
         presentCount,
@@ -93,6 +93,65 @@ export async function markSessionAttendance(sessionId: string, records: any[], m
         attendanceMarkedAt: new Date(),
       },
     });
+
+    // Asynchronously check and send WhatsApp warnings for low attendance
+    setTimeout(async () => {
+      try {
+        const sessionWithBatch = await prisma.classSession.findUnique({
+          where: { id: sessionId },
+          include: {
+            batch: {
+              include: {
+                course: {
+                  select: { minAttendancePct: true }
+                }
+              }
+            }
+          }
+        });
+        if (!sessionWithBatch) return;
+        const minPct = sessionWithBatch.batch.course?.minAttendancePct ?? 75;
+
+        for (const record of records) {
+          const student = await prisma.student.findUnique({
+            where: { id: record.studentId },
+            include: {
+              user: {
+                select: { firstName: true, phone: true }
+              }
+            }
+          });
+
+          if (student && student.user.phone) {
+            const sessionsInBatch = await prisma.classSession.findMany({
+              where: { batchId: sessionWithBatch.batchId, attendanceMarked: true },
+              select: { id: true }
+            });
+            const totalMarkedSessions = sessionsInBatch.length;
+
+            if (totalMarkedSessions > 0) {
+              const presentCount = await prisma.attendanceRecord.count({
+                where: {
+                  studentId: student.id,
+                  sessionId: { in: sessionsInBatch.map(s => s.id) },
+                  status: { in: ['PRESENT', 'LATE'] }
+                }
+              });
+
+              const attendancePct = (presentCount / totalMarkedSessions) * 100;
+              if (attendancePct < minPct) {
+                const { sendWhatsAppAttendanceWarning } = require('../../services/whatsapp.service');
+                await sendWhatsAppAttendanceWarning(student.user.phone, attendancePct, student.user.firstName);
+              }
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to process WhatsApp low attendance warnings', err);
+      }
+    }, 0);
+
+    return updatedSession;
   });
 }
 

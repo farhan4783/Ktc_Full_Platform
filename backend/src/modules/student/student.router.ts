@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { authenticate } from '../../middleware/auth';
 import { requireRole } from '../../middleware/rbac';
 import { validateBody } from '../../middleware/validate';
-import { updateStudentProfileSchema, importStudentsSchema } from './student.schema';
+import { updateStudentProfileSchema, importStudentsSchema, evaluateMockInterviewSchema } from './student.schema';
 import * as studentController from './student.controller';
 import { auditLog } from '../../middleware/auditLog';
 
@@ -43,6 +43,13 @@ router.post(
   auditLog('Student'),
   validateBody(importStudentsSchema),
   studentController.importStudents
+);
+
+router.post(
+  '/:id/mock-interview',
+  requireRole('STUDENT'),
+  validateBody(evaluateMockInterviewSchema),
+  studentController.evaluateStudentMockInterview
 );
 
 export default router;

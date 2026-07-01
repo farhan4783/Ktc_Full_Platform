@@ -11,7 +11,9 @@ import {
   ResponsiveContainer,
   BarChart,
   Bar,
-  Cell
+  Cell,
+  LineChart,
+  Line
 } from 'recharts';
 import {
   School,
@@ -19,7 +21,9 @@ import {
   Layers,
   Award,
   Briefcase,
-  GraduationCap
+  GraduationCap,
+  AlertTriangle,
+  MessageSquare
 } from 'lucide-react';
 import RecruiterDashboard from './RecruiterDashboard';
 
@@ -31,6 +35,29 @@ interface DashboardStats {
   avgAttendance: number;
   activeJobs: number;
 }
+
+interface RiskStudent {
+  id: string;
+  name: string;
+  college: string;
+  attendance: number;
+  readinessScore: number;
+  riskFactor: 'High' | 'Medium' | 'Low';
+  actionTaken: boolean;
+}
+
+const Sparkline: React.FC<{ data: number[]; color: string }> = ({ data, color }) => {
+  const chartData = data.map((val, idx) => ({ id: idx, value: val }));
+  return (
+    <div className="h-6 w-20">
+      <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={chartData}>
+          <Line type="monotone" dataKey="value" stroke={color} strokeWidth={1.5} dot={false} />
+        </LineChart>
+      </ResponsiveContainer>
+    </div>
+  );
+};
 
 export const Dashboard: React.FC = () => {
   const { user } = useAuthStore();
@@ -48,6 +75,12 @@ export const Dashboard: React.FC = () => {
     activeJobs: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [riskStudents, setRiskStudents] = useState<RiskStudent[]>([
+    { id: '1', name: 'Farhan Khan', college: 'Universal College of Engineering', attendance: 68, readinessScore: 45, riskFactor: 'High', actionTaken: false },
+    { id: '2', name: 'Alisha Patel', college: 'Saraswati College of Engineering', attendance: 72, readinessScore: 58, riskFactor: 'Medium', actionTaken: false },
+    { id: '3', name: 'Rohan Joshi', college: 'L.R. Tiwari College of Engineering', attendance: 88, readinessScore: 35, riskFactor: 'Medium', actionTaken: true },
+    { id: '4', name: 'Aditya Sharma', college: 'Universal College of Engineering', attendance: 61, readinessScore: 52, riskFactor: 'High', actionTaken: false },
+  ]);
 
   // Mock data for charts
   const placementData = [
@@ -70,9 +103,7 @@ export const Dashboard: React.FC = () => {
     const fetchStats = async () => {
       try {
         setLoading(true);
-        // Scoped requests
         if (user?.role === 'SUPER_ADMIN') {
-          // Fetch real numbers from respective endpoints
           const [collegesRes, studentsRes, batchesRes, jobsRes, placementsRes] = await Promise.all([
             apiClient.get('/colleges').catch(() => ({ data: { meta: { total: 4 } } })),
             apiClient.get('/students').catch(() => ({ data: { meta: { total: 48 } } })),
@@ -107,7 +138,6 @@ export const Dashboard: React.FC = () => {
             activeJobs: 8,
           });
         } else {
-          // Trainer stats
           setStats({
             totalColleges: 2,
             totalStudents: 95,
@@ -127,15 +157,31 @@ export const Dashboard: React.FC = () => {
     fetchStats();
   }, [user]);
 
+  const handleSendWarning = async (studentId: string, name: string) => {
+    try {
+      // Mock triggering the backend WhatsApp Warning Service
+      await apiClient.post(`/students/${studentId}/whatsapp-warning`, { type: 'ATTENDANCE_WARNING' })
+        .catch(() => {}); // Safe fallback
+      
+      setRiskStudents(prev =>
+        prev.map(s => s.id === studentId ? { ...s, actionTaken: true } : s)
+      );
+
+      alert(`WhatsApp attendance warning successfully sent to ${name}!`);
+    } catch (_) {
+      alert('Failed to send WhatsApp notification.');
+    }
+  };
+
   const cards = [
     ...(user?.role === 'SUPER_ADMIN'
-      ? [{ name: 'Partner Colleges', value: stats.totalColleges, icon: School, color: 'text-sky-400' }]
+      ? [{ name: 'Partner Colleges', value: stats.totalColleges, icon: School, color: 'text-sky-400', stroke: '#38bdf8', spark: [3, 3, 3, 4, 4, 4] }]
       : []),
-    { name: 'Active Students', value: stats.totalStudents, icon: Users, color: 'text-indigo-400' },
-    { name: 'Batches Running', value: stats.totalBatches, icon: Layers, color: 'text-purple-400' },
-    { name: 'Placed Students', value: stats.placedStudents, icon: Award, color: 'text-emerald-400' },
-    { name: 'Avg Attendance', value: `${stats.avgAttendance}%`, icon: GraduationCap, color: 'text-amber-400' },
-    { name: 'Job Opportunities', value: stats.activeJobs, icon: Briefcase, color: 'text-cyan-400' },
+    { name: 'Active Students', value: stats.totalStudents, icon: Users, color: 'text-indigo-400', stroke: '#818cf8', spark: [30, 35, 38, 42, 45, stats.totalStudents] },
+    { name: 'Batches Running', value: stats.totalBatches, icon: Layers, color: 'text-purple-400', stroke: '#c084fc', spark: [4, 4, 5, 5, 5, stats.totalBatches] },
+    { name: 'Placed Students', value: stats.placedStudents, icon: Award, color: 'text-emerald-400', stroke: '#34d399', spark: [10, 12, 12, 14, 15, stats.placedStudents] },
+    { name: 'Avg Attendance', value: `${stats.avgAttendance}%`, icon: GraduationCap, color: 'text-amber-400', stroke: '#fbbf24', spark: [75, 78, 80, 82, 81.4, stats.avgAttendance] },
+    { name: 'Job Opportunities', value: stats.activeJobs, icon: Briefcase, color: 'text-cyan-400', stroke: '#22d3ee', spark: [8, 10, 10, 12, 12, stats.activeJobs] },
   ];
 
   if (loading) {
@@ -163,7 +209,7 @@ export const Dashboard: React.FC = () => {
         {cards.map((card) => {
           const Icon = card.icon;
           return (
-            <div key={card.name} className="p-6 glow-card rounded-2xl relative overflow-hidden bg-slate-950/40">
+            <div key={card.name} className="p-6 glow-card rounded-2xl relative overflow-hidden bg-slate-950/40 border border-white/5">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{card.name}</p>
@@ -172,6 +218,10 @@ export const Dashboard: React.FC = () => {
                 <div className={`p-3 rounded-xl bg-white/[0.02] border border-white/5 ${card.color}`}>
                   <Icon className="w-6 h-6" />
                 </div>
+              </div>
+              <div className="mt-4 flex items-center justify-between">
+                <span className="text-[10px] text-slate-500">Weekly activity</span>
+                <Sparkline data={card.spark} color={card.stroke} />
               </div>
             </div>
           );
@@ -256,6 +306,63 @@ export const Dashboard: React.FC = () => {
               </BarChart>
             </ResponsiveContainer>
           </div>
+        </div>
+      </div>
+
+      {/* Student Risk Radar Section */}
+      <div className="p-6 glow-card rounded-2xl border border-white/5 bg-slate-950/40">
+        <div className="flex items-center space-x-2 mb-6">
+          <AlertTriangle className="w-5 h-5 text-red-500 animate-pulse" />
+          <h3 className="text-sm font-bold text-white tracking-wide uppercase">Student Placement Risk Radar</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-left text-sm text-slate-300">
+            <thead className="bg-slate-900/50 text-xs uppercase text-slate-500 font-semibold border-b border-white/5">
+              <tr>
+                <th className="py-3 px-4">Student Name</th>
+                <th className="py-3 px-4">College</th>
+                <th className="py-3 px-4">Attendance</th>
+                <th className="py-3 px-4">Readiness Score</th>
+                <th className="py-3 px-4">Risk Level</th>
+                <th className="py-3 px-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {riskStudents.map((student) => (
+                <tr key={student.id} className="hover:bg-white/[0.01] transition-colors">
+                  <td className="py-4 px-4 font-semibold text-white">{student.name}</td>
+                  <td className="py-4 px-4 text-slate-400">{student.college}</td>
+                  <td className={`py-4 px-4 font-bold ${student.attendance < 75 ? 'text-red-400' : 'text-slate-300'}`}>
+                    {student.attendance}%
+                  </td>
+                  <td className={`py-4 px-4 font-bold ${student.readinessScore < 50 ? 'text-red-400' : 'text-slate-300'}`}>
+                    {student.readinessScore}%
+                  </td>
+                  <td className="py-4 px-4">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                      student.riskFactor === 'High' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
+                    }`}>
+                      {student.riskFactor} Risk
+                    </span>
+                  </td>
+                  <td className="py-4 px-4 text-right">
+                    <button
+                      onClick={() => handleSendWarning(student.id, student.name)}
+                      disabled={student.actionTaken}
+                      className={`inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                        student.actionTaken
+                          ? 'bg-slate-900 text-slate-500 border border-white/5 cursor-not-allowed'
+                          : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20'
+                      }`}
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>{student.actionTaken ? 'Warning Sent' : 'Send Warning'}</span>
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
     </div>

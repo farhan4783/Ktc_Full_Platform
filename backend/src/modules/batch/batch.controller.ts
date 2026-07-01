@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import * as batchService from './batch.service';
 import { sendSuccess } from '../../utils/response';
 import { AppError } from '../../middleware/errorHandler';
+import { getCache, setCache, deleteCache } from '../../config/redis';
 
 export async function createBatch(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -15,6 +16,8 @@ export async function createBatch(req: Request, res: Response, next: NextFunctio
     next(error);
   }
 }
+
+import prisma from '../../config/database';
 
 export async function getBatches(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
@@ -57,12 +60,19 @@ export async function getBatches(req: Request, res: Response, next: NextFunction
   }
 }
 
-import prisma from '../../config/database';
-
 export async function getBatch(req: Request, res: Response, next: NextFunction): Promise<void> {
   try {
     const { id } = req.params;
-    const batch = await batchService.getBatchById(id);
+    const cacheKey = `batch:${id}`;
+
+    let batch;
+    const cachedData = await getCache(cacheKey);
+    if (cachedData) {
+      batch = JSON.parse(cachedData);
+    } else {
+      batch = await batchService.getBatchById(id);
+      await setCache(cacheKey, JSON.stringify(batch), 60); // cache for 60 seconds
+    }
 
     // Multi-tenant check: College Admin can only access their own college's batches
     if (req.user?.role === 'COLLEGE_ADMIN' && batch.collegeId !== req.user.collegeId) {
@@ -75,7 +85,7 @@ export async function getBatch(req: Request, res: Response, next: NextFunction):
       if (!student) {
         throw new AppError('Student profile not found', 404, 'STUDENT_NOT_FOUND');
       }
-      const isEnrolled = batch.batchStudents.some((bs) => bs.studentId === student.id);
+      const isEnrolled = batch.batchStudents.some((bs: any) => bs.studentId === student.id);
       if (!isEnrolled) {
         throw new AppError('Access denied: You are not enrolled in this batch', 403, 'FORBIDDEN');
       }
@@ -91,6 +101,7 @@ export async function updateBatch(req: Request, res: Response, next: NextFunctio
   try {
     const { id } = req.params;
     const batch = await batchService.updateBatch(id, req.body);
+    await deleteCache(`batch:${id}`); // Invalidate cache
     sendSuccess(res, batch, 200);
   } catch (error) {
     next(error);
@@ -105,6 +116,7 @@ export async function enrollStudents(req: Request, res: Response, next: NextFunc
       throw new AppError('Unauthorized', 401, 'UNAUTHORIZED');
     }
     const result = await batchService.enrollStudents(id, req.body.studentIds, enrollerId);
+    await deleteCache(`batch:${id}`); // Invalidate cache
     sendSuccess(res, result, 200);
   } catch (error) {
     next(error);
@@ -115,6 +127,7 @@ export async function unenrollStudent(req: Request, res: Response, next: NextFun
   try {
     const { id, studentId } = req.params;
     const result = await batchService.unenrollStudent(id, studentId);
+    await deleteCache(`batch:${id}`); // Invalidate cache
     sendSuccess(res, result, 200);
   } catch (error) {
     next(error);

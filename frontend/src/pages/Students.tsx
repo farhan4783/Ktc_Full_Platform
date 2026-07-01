@@ -3,6 +3,78 @@ import { useAuthStore } from '../store/authStore';
 import apiClient from '../config/axios';
 import { Search, Upload, X, AlertCircle, Award, Check, ExternalLink, Loader } from 'lucide-react';
 
+interface CSVRow {
+  index: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  enrollmentNumber: string;
+  branch: string;
+  graduationYear: string;
+  cgpa: string;
+  errors: Record<string, string>;
+}
+
+const validateCSVRow = (row: CSVRow) => {
+  const errors: Record<string, string> = {};
+  if (!row.firstName) errors.firstName = 'First Name is required';
+  if (!row.lastName) errors.lastName = 'Last Name is required';
+  if (!row.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(row.email)) {
+    errors.email = 'Invalid email address';
+  }
+  const grad = parseInt(row.graduationYear);
+  if (isNaN(grad) || grad < 2000 || grad > 2100) {
+    errors.graduationYear = 'Graduation year must be between 2000 and 2100';
+  }
+  const gpa = parseFloat(row.cgpa);
+  if (isNaN(gpa) || gpa < 0 || gpa > 10) {
+    errors.cgpa = 'CGPA must be between 0.0 and 10.0';
+  }
+  row.errors = errors;
+};
+
+const parseCSV = (text: string): CSVRow[] => {
+  const lines = text.split('\n');
+  if (lines.length === 0) return [];
+  
+  const headers = lines[0].split(',').map(h => h.trim());
+  const rows: CSVRow[] = [];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    
+    const values = line.split(',').map(v => v.trim());
+    const row: CSVRow = {
+      index: i,
+      firstName: '',
+      lastName: '',
+      email: '',
+      enrollmentNumber: '',
+      branch: '',
+      graduationYear: '',
+      cgpa: '',
+      errors: {}
+    };
+    
+    headers.forEach((header, idx) => {
+      const val = values[idx] || '';
+      if (header === 'firstName') row.firstName = val;
+      else if (header === 'lastName') row.lastName = val;
+      else if (header === 'email') row.email = val;
+      else if (header === 'enrollmentNumber') row.enrollmentNumber = val;
+      else if (header === 'branch') row.branch = val;
+      else if (header === 'graduationYear') row.graduationYear = val;
+      else if (header === 'cgpa') row.cgpa = val;
+    });
+    
+    validateCSVRow(row);
+    rows.push(row);
+  }
+  
+  return rows;
+};
+
 interface Student {
   id: string;
   studentCode: string;
@@ -157,8 +229,11 @@ export const Students: React.FC = () => {
     }
   }, []);
 
+  const [csvDataRows, setCsvDataRows] = useState<CSVRow[]>([]);
+
   const handleOpenImport = () => {
     setCsvFile(null);
+    setCsvDataRows([]);
     setImportResults(null);
     setImportError(null);
     if (isSuperAdmin) {
@@ -167,48 +242,92 @@ export const Students: React.FC = () => {
     setIsImportOpen(true);
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setCsvFile(file);
+    setImportError(null);
+    setImportResults(null);
+    
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const text = evt.target?.result;
+        if (typeof text === 'string') {
+          try {
+            const parsed = parseCSV(text);
+            setCsvDataRows(parsed);
+          } catch (_) {
+            setImportError('Failed to parse CSV file');
+          }
+        }
+      };
+      reader.readAsText(file);
+    } else {
+      setCsvDataRows([]);
+    }
+  };
+
+  const handleCellChange = (rowIndex: number, field: keyof CSVRow, value: string) => {
+    setCsvDataRows(prev => {
+      const copy = [...prev];
+      const updatedRow = { ...copy[rowIndex], [field]: value };
+      validateCSVRow(updatedRow);
+      copy[rowIndex] = updatedRow;
+      return copy;
+    });
+  };
+
   const handleImportSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedCollegeId) {
       setImportError('Please select a target college');
       return;
     }
-    if (!csvFile) {
-      setImportError('Please select a CSV file');
+    if (csvDataRows.length === 0) {
+      setImportError('Please upload a valid CSV file first');
+      return;
+    }
+
+    const hasErrors = csvDataRows.some(row => Object.keys(row.errors).length > 0);
+    if (hasErrors) {
+      setImportError('Please resolve all validation errors in the spreadsheet before importing.');
       return;
     }
 
     setImporting(true);
     setImportError(null);
 
-    const reader = new FileReader();
-    reader.onload = async (evt) => {
-      const csvData = evt.target?.result;
-      if (typeof csvData !== 'string') {
-        setImportError('Failed to read CSV content');
-        setImporting(false);
-        return;
-      }
+    try {
+      const headers = ['firstName', 'lastName', 'email', 'enrollmentNumber', 'branch', 'graduationYear', 'cgpa'];
+      const csvLines = [headers.join(',')];
+      
+      csvDataRows.forEach(row => {
+        csvLines.push([
+          row.firstName,
+          row.lastName,
+          row.email,
+          row.enrollmentNumber,
+          row.branch,
+          row.graduationYear,
+          row.cgpa
+        ].join(','));
+      });
+      
+      const cleanCsvData = csvLines.join('\n');
 
-      try {
-        const res = await apiClient.post('/students/import', {
-          collegeId: selectedCollegeId,
-          csvData,
-        });
+      const res = await apiClient.post('/students/import', {
+        collegeId: selectedCollegeId,
+        csvData: cleanCsvData,
+      });
 
-        setImportResults(res.data.data);
-        fetchStudents();
-      } catch (err: any) {
-        setImportError(err.response?.data?.message || 'CSV Import failed');
-      } finally {
-        setImporting(false);
-      }
-    };
-    reader.onerror = () => {
-      setImportError('Failed to read file');
+      setImportResults(res.data.data);
+      setCsvDataRows([]);
+      fetchStudents();
+    } catch (err: any) {
+      setImportError(err.response?.data?.message || 'CSV Import failed');
+    } finally {
       setImporting(false);
-    };
-    reader.readAsText(csvFile);
+    }
   };
 
   return (
@@ -398,7 +517,7 @@ export const Students: React.FC = () => {
                     <input
                       type="file"
                       accept=".csv"
-                      onChange={(e) => setCsvFile(e.target.files?.[0] || null)}
+                      onChange={handleFileChange}
                       className="absolute inset-0 opacity-0 cursor-pointer"
                     />
                     <Upload className="w-8 h-8 text-brand mx-auto mb-3" />
@@ -409,10 +528,115 @@ export const Students: React.FC = () => {
                   </div>
                 </div>
 
+                {csvDataRows.length > 0 && (
+                  <div className="space-y-4 pt-4 border-t border-white/5">
+                    <div className="flex items-center justify-between">
+                      <h4 className="text-xs font-bold text-white uppercase tracking-wider">Spreadsheet Preview & Correction</h4>
+                      <span className="text-[10px] text-amber-400 font-bold uppercase">
+                        {csvDataRows.filter(r => Object.keys(r.errors).length > 0).length} Row Errors
+                      </span>
+                    </div>
+                    <div className="overflow-x-auto max-h-60 border border-white/5 rounded-xl bg-white/[0.01]">
+                      <table className="w-full text-xs text-slate-300 border-collapse text-left min-w-[800px]">
+                        <thead className="bg-slate-900/50 text-slate-400 font-semibold sticky top-0 border-b border-white/5">
+                          <tr>
+                            <th className="px-3 py-2 w-10 text-center">Row</th>
+                            <th className="px-3 py-2">First Name</th>
+                            <th className="px-3 py-2">Last Name</th>
+                            <th className="px-3 py-2">Email</th>
+                            <th className="px-3 py-2">Enrollment</th>
+                            <th className="px-3 py-2">Branch</th>
+                            <th className="px-3 py-2">Grad Year</th>
+                            <th className="px-3 py-2">CGPA</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-white/5">
+                          {csvDataRows.map((row, idx) => (
+                            <tr key={row.index} className="hover:bg-white/[0.01] transition-colors">
+                              <td className="px-3 py-2 text-center text-slate-500 font-mono">{idx + 1}</td>
+                              <td className="px-2 py-1.5">
+                                <input
+                                  type="text"
+                                  value={row.firstName}
+                                  onChange={(e) => handleCellChange(idx, 'firstName', e.target.value)}
+                                  className={`w-full px-2 py-1 rounded bg-transparent border text-white text-xs focus:outline-none ${
+                                    row.errors.firstName ? 'border-red-500/50 bg-red-950/20' : 'border-white/5 focus:border-brand/40'
+                                  }`}
+                                  title={row.errors.firstName}
+                                />
+                              </td>
+                              <td className="px-2 py-1.5">
+                                <input
+                                  type="text"
+                                  value={row.lastName}
+                                  onChange={(e) => handleCellChange(idx, 'lastName', e.target.value)}
+                                  className={`w-full px-2 py-1 rounded bg-transparent border text-white text-xs focus:outline-none ${
+                                    row.errors.lastName ? 'border-red-500/50 bg-red-950/20' : 'border-white/5 focus:border-brand/40'
+                                  }`}
+                                  title={row.errors.lastName}
+                                />
+                              </td>
+                              <td className="px-2 py-1.5">
+                                <input
+                                  type="text"
+                                  value={row.email}
+                                  onChange={(e) => handleCellChange(idx, 'email', e.target.value)}
+                                  className={`w-full px-2 py-1 rounded bg-transparent border text-white text-xs focus:outline-none ${
+                                    row.errors.email ? 'border-red-500/50 bg-red-950/20' : 'border-white/5 focus:border-brand/40'
+                                  }`}
+                                  title={row.errors.email}
+                                />
+                              </td>
+                              <td className="px-2 py-1.5">
+                                <input
+                                  type="text"
+                                  value={row.enrollmentNumber}
+                                  onChange={(e) => handleCellChange(idx, 'enrollmentNumber', e.target.value)}
+                                  className="w-full px-2 py-1 rounded bg-transparent border border-white/5 text-white text-xs focus:outline-none focus:border-brand/40"
+                                />
+                              </td>
+                              <td className="px-2 py-1.5">
+                                <input
+                                  type="text"
+                                  value={row.branch}
+                                  onChange={(e) => handleCellChange(idx, 'branch', e.target.value)}
+                                  className="w-full px-2 py-1 rounded bg-transparent border border-white/5 text-white text-xs focus:outline-none focus:border-brand/40"
+                                />
+                              </td>
+                              <td className="px-2 py-1.5">
+                                <input
+                                  type="text"
+                                  value={row.graduationYear}
+                                  onChange={(e) => handleCellChange(idx, 'graduationYear', e.target.value)}
+                                  className={`w-full px-2 py-1 rounded bg-transparent border text-white text-xs focus:outline-none ${
+                                    row.errors.graduationYear ? 'border-red-500/50 bg-red-950/20' : 'border-white/5 focus:border-brand/40'
+                                  }`}
+                                  title={row.errors.graduationYear}
+                                />
+                              </td>
+                              <td className="px-2 py-1.5">
+                                <input
+                                  type="text"
+                                  value={row.cgpa}
+                                  onChange={(e) => handleCellChange(idx, 'cgpa', e.target.value)}
+                                  className={`w-full px-2 py-1 rounded bg-transparent border text-white text-xs focus:outline-none ${
+                                    row.errors.cgpa ? 'border-red-500/50 bg-red-950/20' : 'border-white/5 focus:border-brand/40'
+                                  }`}
+                                  title={row.errors.cgpa}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+
                 <button
                   type="submit"
-                  disabled={importing}
-                  className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-dark to-brand-electric text-white font-bold text-sm tracking-wide shadow-[0_0_15px_rgba(0,210,255,0.2)] disabled:opacity-50"
+                  disabled={importing || csvDataRows.some(row => Object.keys(row.errors).length > 0)}
+                  className="w-full py-3 rounded-xl bg-gradient-to-r from-brand-dark to-brand-electric text-white font-bold text-sm tracking-wide shadow-[0_0_15px_rgba(0,210,255,0.2)] disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 disabled:shadow-none disabled:cursor-not-allowed"
                 >
                   {importing ? 'PARSING & IMPORTING...' : 'RUN BULK IMPORT'}
                 </button>

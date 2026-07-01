@@ -44,6 +44,7 @@ export const DashboardLayout: React.FC<{ children: React.ReactNode }> = ({ child
           { name: 'Trainers', path: '/trainers', icon: GraduationCap },
           { name: 'Courses', path: '/courses', icon: BookOpen },
           { name: 'Batches', path: '/batches', icon: Layers },
+          { name: 'Cert Designer', path: '/certificate-designer', icon: Award },
           { name: 'Placements', path: '/placements', icon: Award },
           { name: 'Jobs', path: '/jobs', icon: Briefcase },
           { name: 'Communication', path: '/communication', icon: Megaphone },
